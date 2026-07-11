@@ -15,7 +15,7 @@ The core product loop stays strong: users make football predictions, local AI le
 
 ## Phase 1: Rebrand And Old-Stack Cleanup
 
-**Status: Complete.** Visible product copy, metadata, README positioning, navbar branding, auth-gate wording, and old-stack user-facing references have been updated for ShadowSage. Deeper Sui/MemWal/Gemini internals remain intentionally in place until the dedicated QVAC, WDK, and local-memory phases.
+**Status: Complete.** Visible product copy, metadata, README positioning, navbar branding, auth-gate wording, and old-stack user-facing references have been updated for ShadowSage. Deeper Sui/MemWal internals remain intentionally in place until the dedicated WDK and local-memory phases.
 
 - Rename visible product copy from **Shadow Pundit** to **ShadowSage**.
 - Replace old hackathon positioning with Tether Developers Cup positioning:
@@ -68,6 +68,8 @@ The core product loop stays strong: users make football predictions, local AI le
   - "Outside service used: football fixture/result data via football-data.org. All AI runs locally through QVAC."
 
 ## Phase 3: QVAC AI Integration
+
+**Status: Complete.** Product AI behavior now routes through `src/lib/qvac.ts`, a local QVAC runtime adapter with configurable endpoint/model settings. Chat streaming, prediction extraction, bias detection, Shadow persona generation, Shadow replies, and roasts no longer use Gemini/OpenRouter provider checks. The chat UI exposes a QVAC local/private/no-cloud status badge and routes return recoverable unavailable states when the local runtime is not configured.
 
 - Replace the cloud AI provider layer with a QVAC provider layer.
 - All AI behavior must use QVAC:

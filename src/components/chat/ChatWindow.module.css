@@ -50,6 +50,51 @@
   min-height: 100%;
 }
 
+.qvacStatus {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  max-width: 100%;
+  padding: var(--sp-1) var(--sp-3);
+  border-radius: var(--r-full);
+  border: 1px solid var(--border);
+  background: oklch(0.16 0.02 260 / 0.72);
+  color: var(--text-muted);
+  font-size: var(--step--1);
+  line-height: 1.25;
+}
+.qvacStatus[data-state="ready"] {
+  border-color: oklch(0.72 0.14 165 / 0.34);
+  color: var(--text);
+}
+.qvacStatus[data-state="unconfigured"] {
+  border-color: oklch(0.73 0.17 65 / 0.34);
+}
+.qvacDot {
+  width: 7px;
+  height: 7px;
+  flex: 0 0 7px;
+  border-radius: var(--r-full);
+  background: oklch(0.72 0.14 165);
+  box-shadow: 0 0 0 4px oklch(0.72 0.14 165 / 0.12);
+}
+.qvacStatus[data-state="unconfigured"] .qvacDot {
+  background: oklch(0.73 0.17 65);
+  box-shadow: 0 0 0 4px oklch(0.73 0.17 65 / 0.12);
+}
+.qvacLabel {
+  flex: 0 0 auto;
+  font-weight: 700;
+}
+.qvacDetail {
+  min-width: 0;
+  color: var(--text-faint);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 /* Session divider — a centered hairline label ("Today"). */
 .divider {
   display: flex;
@@ -213,6 +258,12 @@
 }
 
 @media (max-width: 560px) {
+  .qvacStatus {
+    align-self: stretch;
+  }
+  .qvacDetail {
+    white-space: normal;
+  }
   .suggestions {
     grid-template-columns: 1fr;
   }

@@ -14,6 +14,7 @@
  */
 
 import { isMemWalConfigured } from "@/lib/memwal";
+import { isQvacConfigured } from "@/lib/qvac";
 import { recallPredictions } from "@/lib/predictions";
 import { summarizePredictionsForPrompt } from "@/lib/predictionMemory";
 import {
@@ -50,6 +51,16 @@ export async function POST() {
       stored: 0,
       analysed: predictions.length,
       reason: `Need at least ${MIN_PREDICTIONS_FOR_BIAS} predictions before analysing.`,
+    });
+  }
+
+  if (!isQvacConfigured()) {
+    return Response.json({
+      detected: [],
+      stored: 0,
+      analysed: predictions.length,
+      reason:
+        "QVAC local runtime is not configured. Start the local model before running bias analysis.",
     });
   }
 

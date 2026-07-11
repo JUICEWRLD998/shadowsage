@@ -1,49 +1,47 @@
-import { createOpenRouter } from "@openrouter/ai-sdk-provider";
-import { generateText } from "ai";
-import { MemWal } from "@mysten-incubation/memwal";
+const endpoint = (process.env.QVAC_RUNTIME_ENDPOINT || process.env.QVAC_BASE_URL || "").replace(/\/+$/, "");
+const path = process.env.QVAC_CHAT_COMPLETIONS_PATH || "/v1/chat/completions";
+const qvacUrl =
+  process.env.QVAC_CHAT_COMPLETIONS_URL ||
+  (endpoint ? `${endpoint}${path.startsWith("/") ? path : `/${path}`}` : "");
+const model = process.env.QVAC_MODEL_ID || "";
 
-// ---- Gemini via OpenRouter: probe each model -------------------------------
-console.log("=== Gemini (via OpenRouter) model probe ===");
-const openrouter = createOpenRouter({
-  apiKey: process.env.OPENROUTER_KEY || process.env.OPENROUTER_API_KEY,
-});
-const models = [
-  "google/gemini-2.5-flash",
-  "google/gemini-2.5-flash-lite",
-  "google/gemini-2.5-pro",
-];
-for (const m of models) {
-  try {
-    const { text } = await generateText({
-      model: openrouter.chat(m),
-      prompt: "Reply with exactly: PONG",
-    });
-    console.log(`  ✓ ${m} -> "${text.trim().slice(0, 20)}"`);
-  } catch (e) {
-    const msg = (e?.message || String(e)).split("\n")[0].slice(0, 90);
-    console.log(`  ✗ ${m} -> ${msg}`);
-  }
+function textFromPayload(payload) {
+  const first = payload?.choices?.[0];
+  return (
+    first?.message?.content ||
+    first?.text ||
+    payload?.output_text ||
+    payload?.text ||
+    payload?.response ||
+    ""
+  );
 }
 
-// ---- MemWal: try both relayers --------------------------------------------
-console.log("\n=== MemWal relayer probe ===");
-const servers = [
-  "https://relayer.memory.walrus.xyz",
-  "https://relayer.memwal.ai",
-];
-for (const serverUrl of servers) {
+console.log("=== QVAC local model probe ===");
+if (!qvacUrl || !model) {
+  console.log("  ✗ QVAC_RUNTIME_ENDPOINT / QVAC_MODEL_ID not set");
+} else {
   try {
-    const memwal = MemWal.create({
-      key: process.env.MEMWAL_DELEGATE_KEY,
-      accountId: process.env.MEMWAL_ACCOUNT_ID,
-      serverUrl,
-      namespace: process.env.MEMWAL_NAMESPACE || "shadowpundit",
+    const res = await fetch(qvacUrl, {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        ...(process.env.QVAC_API_KEY
+          ? { authorization: `Bearer ${process.env.QVAC_API_KEY}` }
+          : {}),
+      },
+      body: JSON.stringify({
+        model,
+        messages: [{ role: "user", content: "Reply with exactly: PONG" }],
+        temperature: 0,
+        stream: false,
+      }),
+      signal: AbortSignal.timeout(15000),
     });
-    const token = `probe-${Date.now()}`;
-    await memwal.rememberAndWait(`probe ${token}`, "conversations", { timeoutMs: 30000 });
-    console.log(`  ✓ ${serverUrl} -> remember OK`);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    console.log(`  ✓ ${model} -> "${textFromPayload(await res.json()).trim().slice(0, 20)}"`);
   } catch (e) {
     const msg = (e?.message || String(e)).split("\n")[0].slice(0, 110);
-    console.log(`  ✗ ${serverUrl} -> ${msg}`);
+    console.log(`  ✗ ${model || "QVAC"} -> ${msg}`);
   }
 }

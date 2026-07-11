@@ -11,8 +11,7 @@
  * Server only.
  */
 
-import { generateText } from "ai";
-import { analysisModel } from "./gemini";
+import { qvacGenerateText } from "./qvac";
 import { buildRoastPrompt } from "@/prompts/roastGeneration";
 import type { BiasType, RoastPayload } from "@/types";
 import type { ResolvedPrediction } from "./scoring";
@@ -43,17 +42,21 @@ export async function generateRoast(input: RoastInput): Promise<RoastPayload | n
   const label = bias ? biasLabel(bias) : "";
 
   try {
-    const { text } = await generateText({
-      model: analysisModel,
-      prompt: buildRoastPrompt({
-        match: resolved.match,
-        userPick: resolved.pick,
-        predictedScore: resolved.predictedScore,
-        confidence: resolved.confidence,
-        reasoning: resolved.reasoning,
-        actualScore: resolved.actualScore,
-        biasLabel: label,
-      }),
+    const text = await qvacGenerateText({
+      messages: [
+        {
+          role: "user",
+          content: buildRoastPrompt({
+            match: resolved.match,
+            userPick: resolved.pick,
+            predictedScore: resolved.predictedScore,
+            confidence: resolved.confidence,
+            reasoning: resolved.reasoning,
+            actualScore: resolved.actualScore,
+            biasLabel: label,
+          }),
+        },
+      ],
       temperature: 0.9,
     });
 

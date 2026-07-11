@@ -42,6 +42,14 @@ interface ShadowTurn {
   pending: boolean;
 }
 
+interface QvacStatusResponse {
+  configured: boolean;
+  modelId: string;
+  localOnly: boolean;
+  cloudKeysUsed: boolean;
+  state: "ready" | "unconfigured";
+}
+
 /** Conversation openers shown on the empty state. */
 const SUGGESTIONS = [
   "Who are the favourites to win the World Cup this year?",
@@ -71,6 +79,7 @@ export function ChatWindow() {
   });
 
   const { emerge, respond } = useShadowState();
+  const [qvacStatus, setQvacStatus] = useState<QvacStatusResponse | null>(null);
 
   const scrollRef = useRef<HTMLDivElement>(null);
   const endRef = useRef<HTMLDivElement>(null);
@@ -95,6 +104,29 @@ export function ChatWindow() {
   // Show a standalone "thinking" bubble only while we wait for the first token
   // (once streaming begins, the assistant message itself carries the text).
   const awaitingFirstToken = status === "submitted";
+
+  useEffect(() => {
+    let active = true;
+    fetch("/api/qvac/status")
+      .then((res) => res.json())
+      .then((data: QvacStatusResponse) => {
+        if (active) setQvacStatus(data);
+      })
+      .catch(() => {
+        if (active) {
+          setQvacStatus({
+            configured: false,
+            modelId: "",
+            localOnly: true,
+            cloudKeysUsed: false,
+            state: "unconfigured",
+          });
+        }
+      });
+    return () => {
+      active = false;
+    };
+  }, []);
 
   const visibleMessages = useMemo(
     () => messages.filter((m) => displayRole(m) !== null),
@@ -173,6 +205,8 @@ export function ChatWindow() {
     <section className={styles.window}>
       <div className={styles.scroll} ref={scrollRef}>
         <div className={styles.thread}>
+          <QvacStatusBadge status={qvacStatus} />
+
           {isEmpty ? (
             <EmptyState onPick={(text) => sendMessage({ text })} disabled={isBusy} />
           ) : (
@@ -255,6 +289,26 @@ export function ChatWindow() {
         )}
       </AnimatePresence>
     </section>
+  );
+}
+
+function QvacStatusBadge({ status }: { status: QvacStatusResponse | null }) {
+  const configured = status?.configured === true;
+  const label = configured ? "QVAC local" : "QVAC offline";
+  const detail = configured
+    ? `${status?.modelId || "local model"} · private inference · no cloud AI`
+    : "Start local model";
+
+  return (
+    <div
+      className={styles.qvacStatus}
+      data-state={configured ? "ready" : "unconfigured"}
+      aria-label={`QVAC status: ${label}`}
+    >
+      <span className={styles.qvacDot} aria-hidden="true" />
+      <span className={styles.qvacLabel}>{label}</span>
+      <span className={styles.qvacDetail}>{detail}</span>
+    </div>
   );
 }
 

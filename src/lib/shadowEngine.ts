@@ -15,14 +15,13 @@
  * Server only.
  */
 
-import {
-  convertToModelMessages,
-  generateObject,
-  generateText,
-  type UIMessage,
-} from "ai";
+import type { UIMessage } from "ai";
 import { z } from "zod";
-import { analysisModel, chatModel } from "./gemini";
+import {
+  qvacGenerateObject,
+  qvacGenerateText,
+  qvacMessagesFromUI,
+} from "./qvac";
 import {
   recallMemories,
   rememberAsync,
@@ -267,10 +266,13 @@ async function generatePersonality(
   predictionHistory: string,
   biasNotes: string,
 ): Promise<ShadowPersonality> {
-  const { object } = await generateObject({
-    model: analysisModel,
+  const object = await qvacGenerateObject({
     schema: personaSchema,
-    prompt: buildPersonaGenPrompt({ predictionHistory, biasNotes }),
+    prompt: [
+      buildPersonaGenPrompt({ predictionHistory, biasNotes }),
+      "",
+      'Return JSON in this shape: {"tone":"sarcastic","knownBiases":["recency_bias"],"catchphrase":"...","favoriteCounterArgument":"...","emergenceMessage":"..."}',
+    ].join("\n"),
     temperature: 0.7,
   });
 
@@ -370,27 +372,25 @@ export async function generateShadowReply(
       shadowRecord: `${r.wins}W-${r.losses}L-${r.draws}D`,
     });
 
-    const modelMessages = await convertToModelMessages(messages);
+    const qvacMessages = [
+      { role: "system" as const, content: system },
+      ...qvacMessagesFromUI(messages),
+    ];
 
-    // Gemini 2.5 Flash (via OpenRouter/Google AI Studio) intermittently returns
-    // a blank completion — finishReason "stop" with 0 output tokens, no reasoning
-    // spend. It's an upstream quirk, not us: the grounding is present and the
-    // prompt never asks the Shadow to stay silent, so an empty reply is a
-    // FAILURE, not a choice. Retry a few times; a small temperature bump per
-    // attempt nudges the sampler off the empty path.
+    // Local models can occasionally return an empty completion. The grounding is
+    // present and the prompt never asks the Shadow to stay silent, so an empty
+    // reply is a failure, not a choice. Retry with a small temperature bump.
     const MAX_ATTEMPTS = 3;
     for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
-      const { text } = await generateText({
-        model: chatModel,
-        system,
-        messages: modelMessages,
+      const text = await qvacGenerateText({
+        messages: qvacMessages,
         temperature: 0.85 + (attempt - 1) * 0.05,
       });
       const trimmed = (text ?? "").trim();
       if (trimmed) return trimmed;
 
       console.warn(
-        `[shadowEngine] empty reply from ${chatModel.modelId} ` +
+        "[shadowEngine] empty reply from QVAC " +
           `(attempt ${attempt}/${MAX_ATTEMPTS})${attempt < MAX_ATTEMPTS ? " — retrying" : ""}`,
       );
     }

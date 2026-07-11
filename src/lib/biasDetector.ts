@@ -2,8 +2,8 @@
  * Bias detector — the silent engine that reads a user's prediction history and
  * surfaces cognitive biases.
  *
- * Runs `generateObject` against the analysis model with a constrained schema,
- * then enriches each raw finding into a full BiasProfile (human label,
+ * Runs QVAC locally, validates the JSON with a constrained schema, then
+ * enriches each raw finding into a full BiasProfile (human label,
  * description, severity tier + DNA colour) and persists it to the Walrus
  * `bias-profile` namespace. A recall helper summarises stored biases as the
  * "private notes" the friendly agent uses to steer its questions without ever
@@ -12,9 +12,8 @@
  * Server only.
  */
 
-import { generateObject } from "ai";
 import { z } from "zod";
-import { analysisModel } from "./gemini";
+import { qvacGenerateObject } from "./qvac";
 import {
   recallMemories,
   rememberAsync,
@@ -121,10 +120,13 @@ export async function detectBiases(
   if (!predictionHistory.trim()) return [];
 
   try {
-    const { object } = await generateObject({
-      model: analysisModel,
+    const object = await qvacGenerateObject({
       schema: detectionSchema,
-      prompt: buildBiasAnalysisPrompt(predictionHistory),
+      prompt: [
+        buildBiasAnalysisPrompt(predictionHistory),
+        "",
+        'Return JSON in this shape: {"biases":[{"type":"recency_bias","severity":1,"confidence":60,"pattern":"...","evidence":["..."]}]}',
+      ].join("\n"),
       temperature: 0.2,
     });
 

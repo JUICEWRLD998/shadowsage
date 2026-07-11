@@ -13,11 +13,11 @@
  *         Generate the Shadow's in-chat interjection for the given conversation.
  *         Empty text means it chose to stay silent.
  *
- * Everything degrades gracefully when MemWal / the model is unavailable.
+ * Everything degrades gracefully when MemWal / QVAC is unavailable.
  */
 
 import type { UIMessage } from "ai";
-import { isGeminiConfigured } from "@/lib/gemini";
+import { isQvacConfigured } from "@/lib/qvac";
 import {
   checkEligibility,
   emergeShadow,
@@ -70,9 +70,12 @@ export async function POST(req: Request) {
     return Response.json({ error: "Invalid JSON body." }, { status: 400 });
   }
 
-  if (!isGeminiConfigured()) {
+  if (!isQvacConfigured()) {
     return Response.json(
-      { error: "The AI model isn't configured." },
+      {
+        error:
+          "QVAC local runtime is not configured. Set QVAC_RUNTIME_ENDPOINT and QVAC_MODEL_ID.",
+      },
       { status: 503 },
     );
   }

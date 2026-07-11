@@ -11,6 +11,7 @@
  */
 
 import { isMemWalConfigured } from "@/lib/memwal";
+import { isQvacConfigured } from "@/lib/qvac";
 import { recallPredictions } from "@/lib/predictions";
 import { getMatches, getCompletedMatches } from "@/lib/worldcup";
 import { resolveAll } from "@/lib/scoring";
@@ -26,6 +27,14 @@ export async function POST() {
 
   if (!isMemWalConfigured()) {
     return Response.json({ roast: null, reason: "Memory not configured." });
+  }
+
+  if (!isQvacConfigured()) {
+    return Response.json({
+      roast: null,
+      reason:
+        "QVAC local runtime is not configured. Start the local model before generating roasts.",
+    });
   }
 
   const [predictions, matches, biases] = await Promise.all([

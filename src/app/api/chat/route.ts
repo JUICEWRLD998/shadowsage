@@ -1,11 +1,10 @@
 /**
  * POST /api/chat — streaming conversation with the ShadowSage companion.
  *
- * AI SDK v6 contract:
+ * AI SDK v6 client contract:
  *   - The client (useChat) sends `{ messages: UIMessage[] }`.
- *   - We translate UI messages → model messages with convertToModelMessages,
- *     prepend the system prompt, and stream the model's reply back as a
- *     UI-message stream the client knows how to render incrementally.
+ *   - We stream QVAC text back as a UI-message stream the client already knows
+ *     how to render incrementally.
  *
  * Phase 2 adds the memory loop around that stream:
  *   1. BEFORE streaming — recall the user's prediction history + silent bias
@@ -17,17 +16,22 @@
  */
 
 import {
-  convertToModelMessages,
-  streamText,
+  createUIMessageStream,
+  createUIMessageStreamResponse,
   type UIMessage,
 } from "ai";
-import { chatModel, isGeminiConfigured } from "@/lib/gemini";
 import { buildFriendlySystemPrompt } from "@/prompts/system";
 import {
   getMatchFeed,
   getUpcomingMatches,
   formatMatchesForPrompt,
 } from "@/lib/worldcup";
+import {
+  isQvacConfigured,
+  qvacMessagesFromUI,
+  qvacStreamText,
+  qvacUserMessage,
+} from "@/lib/qvac";
 import { recallPredictions, buildPrediction, storePrediction } from "@/lib/predictions";
 import { summarizePredictionsForPrompt } from "@/lib/predictionMemory";
 import { extractPrediction } from "@/lib/predictionParser";
@@ -69,9 +73,12 @@ export async function POST(req: Request) {
   if (auth instanceof Response) return auth;
   const userId = auth;
 
-  if (!isGeminiConfigured()) {
+  if (!isQvacConfigured()) {
     return Response.json(
-      { error: "The AI runtime isn't configured yet." },
+      {
+        error:
+          "QVAC local runtime is not configured. Set QVAC_RUNTIME_ENDPOINT and QVAC_MODEL_ID.",
+      },
       { status: 503 },
     );
   }
@@ -115,30 +122,35 @@ export async function POST(req: Request) {
     predictionCount: predictions.length,
   });
 
-  const modelMessages = await convertToModelMessages(messages);
+  const qvacMessages = [
+    { role: "system" as const, content: system },
+    ...qvacMessagesFromUI(messages),
+  ];
 
-  const result = streamText({
-    model: chatModel,
-    system,
-    messages: modelMessages,
-    temperature: 0.8, // a touch of personality without going off the rails
-    // ── Memory write-back, after the reply finishes ───────────────────────
-    onFinish: async ({ text }) => {
+  const stream = createUIMessageStream({
+    originalMessages: messages,
+    onError: qvacUserMessage,
+    execute: async ({ writer }) => {
+      const id = "qvac-response";
+      let assistantText = "";
+
+      writer.write({ type: "text-start", id });
+      assistantText = await qvacStreamText({
+        messages: qvacMessages,
+        temperature: 0.8,
+        onDelta: (delta) => writer.write({ type: "text-delta", id, delta }),
+      });
+      writer.write({ type: "text-end", id });
+
       try {
-        await captureMemory(messages, text, predictions.length, userId);
+        await captureMemory(messages, assistantText, predictions.length, userId);
       } catch (error) {
         console.error("[/api/chat] memory write-back failed:", error);
       }
     },
   });
 
-  // Surface server-side model errors instead of silently closing the stream.
-  return result.toUIMessageStreamResponse({
-    onError: (error) => {
-      console.error("[/api/chat] stream error:", error);
-      return "Something glitched on my end — give that another shot.";
-    },
-  });
+  return createUIMessageStreamResponse({ stream });
 }
 
 /**

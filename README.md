@@ -6,7 +6,7 @@ ShadowSage is a privacy-first football prediction companion for the **Tether Dev
 
 The new build targets the **QVAC** and **WDK** tracks:
 
-- **QVAC primary track:** all AI behavior is planned to run locally on the user's device: chat, prediction extraction, bias analysis, Shadow persona, counter-picks, and roasts.
+- **QVAC primary track:** all AI behavior runs through the local QVAC adapter: chat, prediction extraction, bias analysis, Shadow persona, counter-picks, and roasts.
 - **WDK secondary track:** wallet identity, signed prediction commitments, and USDt stake/tip flows are planned to use Tether's Wallet Development Kit.
 - **Football data:** fixtures and results are fetched through the existing football data adapter using `FOOTBALL_DATA_API_KEY`.
 
@@ -76,6 +76,19 @@ FOOTBALL_DATA_SEASON=2026
 
 If the key is missing or the API is unavailable, the app falls back to seeded fixtures so the demo remains usable.
 
+## QVAC Local AI
+
+All product AI behavior routes through `src/lib/qvac.ts`. The adapter expects a local QVAC runtime with a chat-completions style endpoint by default:
+
+```bash
+QVAC_RUNTIME_ENDPOINT=http://localhost:11434
+QVAC_CHAT_COMPLETIONS_PATH=/v1/chat/completions
+QVAC_MODEL_ID=your_local_qvac_model_id
+QVAC_TIMEOUT_MS=30000
+```
+
+If the runtime or model is unavailable, chat and Shadow routes return recoverable errors and the chat page shows the QVAC status badge.
+
 ## Outside Services
 
 - Submission disclosure: Outside service used: football fixture/result data via football-data.org. All AI runs locally through QVAC.
@@ -100,9 +113,13 @@ FOOTBALL_DATA_URL=https://api.football-data.org/v4
 FOOTBALL_DATA_COMPETITION=WC
 FOOTBALL_DATA_SEASON=2026
 
-# Placeholder values until Phase 3/5 integrations finalize exact SDK requirements.
+# Local QVAC runtime.
 QVAC_RUNTIME_ENDPOINT=your_local_qvac_runtime_endpoint
+QVAC_CHAT_COMPLETIONS_PATH=/v1/chat/completions
 QVAC_MODEL_ID=your_local_qvac_model_id
+QVAC_TIMEOUT_MS=30000
+
+# Placeholder values until Phase 5 integration finalizes exact WDK requirements.
 WDK_NETWORK=testnet
 WDK_APP_ID=shadowsage
 WDK_USDT_ASSET_ID=your_usdt_asset_id
@@ -124,7 +141,7 @@ Open the local URL printed by Next.js, usually `http://localhost:3000`.
 
 ## Current Implementation Status
 
-Phase 1 and Phase 2 are complete: ShadowSage rebrand, Tether Developers Cup positioning, football-data.org fixture/result integration, fallback fixture behavior, and match prompt formatting are in place. The existing codebase still contains some previous integration code while QVAC, WDK, and local wallet-scoped memory are being integrated in later phases. See `implementation.md` for the full phased plan.
+Phase 1, Phase 2, and Phase 3 are complete: ShadowSage rebrand, Tether Developers Cup positioning, football-data.org fixture/result integration, fallback fixture behavior, match prompt formatting, and QVAC-only product AI routing are in place. The existing codebase still contains some previous wallet/memory integration code while WDK and local wallet-scoped memory are being integrated in later phases. See `implementation.md` for the full phased plan.
 
 ## Project Structure
 

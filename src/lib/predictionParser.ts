@@ -5,16 +5,14 @@
  * The friendly agent never asks the user to fill a form; predictions emerge
  * conversationally ("I'll say Brazil 2-1, their midfield is just too much").
  * After each assistant turn we run this extractor over the recent transcript.
- * It uses a constrained `generateObject` call so the model must return our
- * exact schema — no brittle string parsing — and reports its own confidence
- * that a *complete* prediction was actually made, which gates whether we store.
+ * It asks QVAC for a strict JSON object, validates it locally with Zod, and
+ * reports whether a complete prediction was actually made, which gates storage.
  *
  * Server only.
  */
 
-import { generateObject } from "ai";
 import { z } from "zod";
-import { analysisModel } from "./gemini";
+import { qvacGenerateObject } from "./qvac";
 import type { MatchStage, PickSide } from "@/types";
 
 /** A prediction the model successfully lifted out of the conversation. */
@@ -68,7 +66,9 @@ const extractionSchema = z.object({
 });
 
 const SYSTEM = `You extract structured football predictions from a chat transcript.
-You are precise and conservative: only mark hasPrediction=true when the USER (not the assistant) has clearly committed to a specific match outcome. Capture their reasoning faithfully without inventing detail. If multiple predictions appear, extract the most recent complete one.`;
+You are precise and conservative: only mark hasPrediction=true when the USER (not the assistant) has clearly committed to a specific match outcome. Capture their reasoning faithfully without inventing detail. If multiple predictions appear, extract the most recent complete one.
+
+Return JSON with exactly these keys: hasPrediction, teamA, teamB, userPick, predictedScore, confidence, reasoning, stage.`;
 
 /** Minimum transcript length worth sending to the model. */
 const MIN_CHARS = 12;
@@ -85,8 +85,7 @@ export async function extractPrediction(
   if (!transcript || transcript.trim().length < MIN_CHARS) return null;
 
   try {
-    const { object } = await generateObject({
-      model: analysisModel,
+    const object = await qvacGenerateObject({
       schema: extractionSchema,
       system: SYSTEM,
       prompt: `Transcript:\n${transcript}\n\nExtract the prediction.`,
