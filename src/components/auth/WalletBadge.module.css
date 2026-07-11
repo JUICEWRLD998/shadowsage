@@ -37,6 +37,12 @@
   font-size: 0.62rem;
   color: var(--text-faint);
 }
+.balance {
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  color: var(--you-300);
+  font-weight: 500;
+}
 
 .logout {
   display: inline-grid;
