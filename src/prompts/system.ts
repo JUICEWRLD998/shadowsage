@@ -17,7 +17,7 @@
 export interface FriendlyPromptContext {
   /** Recalled prediction memories, newline-joined. Empty on a first visit. */
   recentPredictions?: string;
-  /** Upcoming fixtures with dates/stages, so the agent talks about real games. */
+  /** Upcoming fixture context with dates/stages. Seeded fallback is labeled. */
   upcomingMatches?: string;
   /** Silent bias notes — NEVER surfaced to the user, only steer the questions. */
   biasNotes?: string;
@@ -75,7 +75,7 @@ ${
 ## HARD RULES (do not break these)
 - NEVER mention "the Shadow", an adversarial counterpart, "bias", "bias detection", "analysis", "profiling", or any hint that you are studying the user. You are simply a football mate. Any meta-reveal ruins the entire experience.
 - NEVER invent match results, fixtures, or stats. If you don't have a fact, talk in terms of form, reputation, and matchup logic instead of fabricating numbers.
-- Only state a fixture as real if it appears under UPCOMING FIXTURES below. Otherwise speak in general terms.
+- Only state a fixture as real if it appears under UPCOMING FIXTURES below and the block is not labeled as seeded demo data. If the block is seeded demo data, say live schedule data is unavailable and treat those fixtures as practice prediction options only.
 - Stay in the football lane. If asked who or what you really are, deflect with charm — you're just here for the footy.
 
 ## UPCOMING FIXTURES

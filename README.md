@@ -71,13 +71,14 @@ Optional variables already supported by the adapter:
 ```bash
 FOOTBALL_DATA_URL=https://api.football-data.org/v4
 FOOTBALL_DATA_COMPETITION=WC
+FOOTBALL_DATA_SEASON=2026
 ```
 
 If the key is missing or the API is unavailable, the app falls back to seeded fixtures so the demo remains usable.
 
 ## Outside Services
 
-- Football fixture/result data: football-data.org through `FOOTBALL_DATA_API_KEY`.
+- Submission disclosure: Outside service used: football fixture/result data via football-data.org. All AI runs locally through QVAC.
 - AI: final Tether Developers Cup build must use QVAC locally, with no cloud AI API keys.
 - Wallets/payments: final Tether Developers Cup build must use WDK directly for wallet identity, signing, and USDt-related primitives.
 
@@ -95,9 +96,19 @@ Create `.env.local`:
 
 ```bash
 FOOTBALL_DATA_API_KEY=your_football_data_api_key
+FOOTBALL_DATA_URL=https://api.football-data.org/v4
+FOOTBALL_DATA_COMPETITION=WC
+FOOTBALL_DATA_SEASON=2026
+
+# Placeholder values until Phase 3/5 integrations finalize exact SDK requirements.
+QVAC_RUNTIME_ENDPOINT=your_local_qvac_runtime_endpoint
+QVAC_MODEL_ID=your_local_qvac_model_id
+WDK_NETWORK=testnet
+WDK_APP_ID=shadowsage
+WDK_USDT_ASSET_ID=your_usdt_asset_id
 ```
 
-Copy `.env.example` when present:
+Or copy `.env.example`:
 
 ```bash
 cp .env.example .env.local
@@ -113,7 +124,7 @@ Open the local URL printed by Next.js, usually `http://localhost:3000`.
 
 ## Current Implementation Status
 
-Phase 1 is complete: ShadowSage rebrand, Tether Developers Cup positioning, metadata updates, and user-facing old-stack cleanup are done. The existing codebase still contains some previous integration code while QVAC, WDK, and local wallet-scoped memory are being integrated in later phases. See `implementation.md` for the full phased plan.
+Phase 1 and Phase 2 are complete: ShadowSage rebrand, Tether Developers Cup positioning, football-data.org fixture/result integration, fallback fixture behavior, and match prompt formatting are in place. The existing codebase still contains some previous integration code while QVAC, WDK, and local wallet-scoped memory are being integrated in later phases. See `implementation.md` for the full phased plan.
 
 ## Project Structure
 

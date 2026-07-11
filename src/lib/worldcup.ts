@@ -2,7 +2,7 @@
  * football-data.org API client (World Cup).
  *
  * Single source of fixtures + results. The free tier includes the World Cup
- * (competition code "WC") at 10 requests/min �� well within our cache window.
+ * competition code "WC"; requests stay well within our cache window.
  *
  *   GET /v4/competitions/WC/matches
  *     → { matches: [ {
@@ -14,43 +14,74 @@
  * Auth: header `X-Auth-Token: <FOOTBALL_DATA_API_KEY>`.
  *
  * Everything is defensive: unparseable records are skipped, and if the API is
- * unreachable or the key is missing we fall back to a small set of real,
- * confirmed-qualified teams so the companion always has credible fixtures. The
- * agent's prompt only ever presents fixtures we hand it, so a graceful fallback
- * is safer than throwing.
+ * unreachable or the key is missing we fall back to seeded demo fixtures so the
+ * app remains usable. Prompt formatting labels fallback data clearly so the AI
+ * does not present seeded fixtures as official schedule data.
  *
  * Server only.
  */
 
-import type { MatchStage, MatchStatus, WorldCupMatch, PickSide } from "@/types";
+import type {
+  MatchDataSource,
+  MatchStage,
+  MatchStatus,
+  PickSide,
+  WorldCupMatch,
+  WorldCupMatchFeed,
+} from "@/types";
 import { countryFlag } from "./flags";
-
-const BASE_URL =
-  process.env.FOOTBALL_DATA_URL?.replace(/\/+$/, "") ||
-  "https://api.football-data.org/v4";
-
-const COMPETITION = process.env.FOOTBALL_DATA_COMPETITION || "WC";
-
-const API_KEY = process.env.FOOTBALL_DATA_API_KEY || "";
 
 /** Cache window (seconds) — fixtures move fast on matchdays. */
 const REVALIDATE = 180; // 3 min
 
+interface FootballDataConfig {
+  baseUrl: string;
+  competition: string;
+  season: string;
+  apiKey: string;
+}
+
+function footballDataConfig(): FootballDataConfig {
+  return {
+    baseUrl:
+      process.env.FOOTBALL_DATA_URL?.replace(/\/+$/, "") ||
+      "https://api.football-data.org/v4",
+    competition: process.env.FOOTBALL_DATA_COMPETITION || "WC",
+    season: process.env.FOOTBALL_DATA_SEASON || "2026",
+    apiKey: process.env.FOOTBALL_DATA_API_KEY || "",
+  };
+}
+
 export function isFootballDataConfigured(): boolean {
-  return Boolean(API_KEY);
+  return Boolean(footballDataConfig().apiKey);
 }
 
 /* ------------------------------------------------------------------ fetch -- */
 
-async function fetchJson(path: string): Promise<unknown> {
-  if (!API_KEY) {
+interface FetchResult {
+  payload: unknown | null;
+  reason?: string;
+}
+
+function matchesPath(config: FootballDataConfig): string {
+  const params = new URLSearchParams();
+  if (config.season) params.set("season", config.season);
+  const query = params.toString();
+  return `/competitions/${config.competition}/matches${query ? `?${query}` : ""}`;
+}
+
+async function fetchJson(
+  path: string,
+  config: FootballDataConfig,
+): Promise<FetchResult> {
+  if (!config.apiKey) {
     console.warn("[worldcup] FOOTBALL_DATA_API_KEY not set — using fallback fixtures");
-    return null;
+    return { payload: null, reason: "FOOTBALL_DATA_API_KEY is missing" };
   }
   try {
-    const res = await fetch(`${BASE_URL}${path}`, {
+    const res = await fetch(`${config.baseUrl}${path}`, {
       next: { revalidate: REVALIDATE },
-      headers: { "X-Auth-Token": API_KEY, accept: "application/json" },
+      headers: { "X-Auth-Token": config.apiKey, accept: "application/json" },
       // football-data's full 104-match response can be slow on a cold request;
       // allow enough headroom to land it instead of dropping to the fallback,
       // while staying under typical serverless limits. Successful responses are
@@ -59,12 +90,12 @@ async function fetchJson(path: string): Promise<unknown> {
     });
     if (!res.ok) {
       console.warn(`[worldcup] ${path} → HTTP ${res.status}`);
-      return null;
+      return { payload: null, reason: `football-data.org returned HTTP ${res.status}` };
     }
-    return await res.json();
+    return { payload: await res.json() };
   } catch (error) {
     console.warn(`[worldcup] ${path} fetch failed:`, error);
-    return null;
+    return { payload: null, reason: "football-data.org request failed" };
   }
 }
 
@@ -201,21 +232,47 @@ function normaliseMatch(
 /* ----------------------------------------------------------------- public -- */
 
 /**
- * All tournament matches, normalised. Falls back to a curated set of real
- * qualified teams when the live API is unreachable or unconfigured.
+ * All tournament matches, normalised. Falls back to seeded demo fixtures when
+ * the live API is unreachable or unconfigured.
  */
-export async function getMatches(): Promise<WorldCupMatch[]> {
-  const payload = await fetchJson(`/competitions/${COMPETITION}/matches`);
+export async function getMatchFeed(): Promise<WorldCupMatchFeed> {
+  const config = footballDataConfig();
+  const fetched = await fetchJson(matchesPath(config), config);
 
-  const matches = unwrap(payload)
+  const matches = unwrap(fetched.payload)
     .map((row, i) => normaliseMatch(row, i))
     .filter((m): m is WorldCupMatch => m !== null);
 
-  return matches.length > 0 ? matches : FALLBACK_FIXTURES;
+  const base = {
+    configured: Boolean(config.apiKey),
+    competition: config.competition,
+    season: config.season,
+    updatedAt: new Date().toISOString(),
+  };
+
+  if (matches.length > 0) {
+    return {
+      ...base,
+      matches,
+      source: "football-data",
+    };
+  }
+
+  return {
+    ...base,
+    matches: buildFallbackFixtures(),
+    source: "fallback",
+    reason: fetched.reason || "football-data.org returned no usable matches",
+  };
+}
+
+/** Compatibility helper for existing server consumers that only need matches. */
+export async function getMatches(): Promise<WorldCupMatch[]> {
+  return (await getMatchFeed()).matches;
 }
 
 function dateValue(m: WorldCupMatch): number {
-  const t = Date.parse(`${m.date}T${m.time || "00:00"}:00`);
+  const t = Date.parse(`${m.date}T${m.time || "00:00"}:00Z`);
   return Number.isNaN(t) ? 0 : t;
 }
 
@@ -250,9 +307,12 @@ export function getCompletedMatches(
  * Render upcoming fixtures as a compact block for the AI system prompt. The
  * agent is told to treat only these as real, so the format stays factual.
  */
-export function formatMatchesForPrompt(matches: WorldCupMatch[]): string {
+export function formatMatchesForPrompt(
+  matches: WorldCupMatch[],
+  options: { source?: MatchDataSource } = {},
+): string {
   if (matches.length === 0) return "";
-  return matches
+  const lines = matches
     .map((m) => {
       const when = [m.date, m.time].filter(Boolean).join(" ");
       const where = [m.stadium, m.city].filter(Boolean).join(", ");
@@ -262,24 +322,53 @@ export function formatMatchesForPrompt(matches: WorldCupMatch[]): string {
       return `- ${m.teamAFlag} ${m.teamA} vs ${m.teamB} ${m.teamBFlag}${meta ? ` (${meta})` : ""}`;
     })
     .join("\n");
+
+  if (options.source === "fallback") {
+    return [
+      "Seeded demo fixtures because live football-data.org data is unavailable.",
+      "Use these only as practice prediction options; do not claim they are official fixtures.",
+      lines,
+    ].join("\n");
+  }
+
+  return lines;
 }
 
 /* --------------------------------------------------------------- fallback -- */
 
 /**
- * Curated fallback — used ONLY when the live API can't be reached. Every team
- * here is a confirmed 2026 participant and the group pairings are real, so the
- * companion never references a team that didn't qualify. Dates are placed just
- * ahead so they read as upcoming; live data always wins when available.
+ * Seeded fallback — used ONLY when the live API can't be reached. Dates roll
+ * forward from the current day so upcoming-fixture surfaces never age out.
+ * Live data always wins when available.
  */
-const FALLBACK_FIXTURES: WorldCupMatch[] = [
-  mkFixture("fb-1", "Mexico", "South Africa", "2026-06-15", "20:00", "A"),
-  mkFixture("fb-2", "South Korea", "Czech Republic", "2026-06-15", "17:00", "A"),
-  mkFixture("fb-3", "Argentina", "Australia", "2026-06-16", "21:00", "C"),
-  mkFixture("fb-4", "France", "Norway", "2026-06-16", "18:00", "E"),
-  mkFixture("fb-5", "Spain", "Croatia", "2026-06-17", "20:00", "B"),
-  mkFixture("fb-6", "Brazil", "Morocco", "2026-06-17", "23:00", "G"),
-];
+const FALLBACK_PAIRS = [
+  ["Mexico", "South Africa", "20:00", "A"],
+  ["South Korea", "Czech Republic", "17:00", "A"],
+  ["Argentina", "Australia", "21:00", "C"],
+  ["France", "Norway", "18:00", "E"],
+  ["Spain", "Croatia", "20:00", "B"],
+  ["Brazil", "Morocco", "23:00", "G"],
+] as const;
+
+function fallbackDate(offsetDays: number, now = new Date()): string {
+  const date = new Date(
+    Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() + offsetDays),
+  );
+  return date.toISOString().slice(0, 10);
+}
+
+function buildFallbackFixtures(now = new Date()): WorldCupMatch[] {
+  return FALLBACK_PAIRS.map(([teamA, teamB, time, group], i) =>
+    mkFixture(
+      `fb-${i + 1}`,
+      teamA,
+      teamB,
+      fallbackDate(Math.floor(i / 2) + 1, now),
+      time,
+      group,
+    ),
+  );
+}
 
 function mkFixture(
   id: string,

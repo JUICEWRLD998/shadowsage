@@ -45,6 +45,8 @@ The core product loop stays strong: users make football predictions, local AI le
 
 ## Phase 2: Football Match Data
 
+**Status: Complete.** The football-data.org adapter remains in `src/lib/worldcup.ts`, uses `FOOTBALL_DATA_API_KEY` plus optional URL/competition/season config, exposes all/upcoming/completed match selection through `/api/matches`, supports prompt formatting for chat grounding, and preserves seeded fallback fixtures when the live API is unavailable.
+
 - Keep the existing football data integration in `src/lib/worldcup.ts`.
 - Use the existing environment variable:
   - `FOOTBALL_DATA_API_KEY`

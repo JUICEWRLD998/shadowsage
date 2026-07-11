@@ -1,11 +1,12 @@
 /**
  * Scoring — resolve stored predictions against real World Cup results.
  *
- * Predictions live in Walrus memory as text (see predictionMemory.ts); the
- * actual outcomes come from the WorldCup26.ir client (worldcup.ts). This module
- * is the bridge: it matches each recalled prediction to a *completed* fixture by
- * team names, decides whether the user's pick was right, and rolls the whole set
- * up into an accuracy summary the Arena renders.
+ * Predictions currently live in wallet-scoped memory text (see
+ * predictionMemory.ts); the actual outcomes come from the football-data.org
+ * adapter (worldcup.ts). This module is the bridge: it matches each recalled
+ * prediction to a *completed* fixture by team names, decides whether the user's
+ * pick was right, and rolls the whole set up into an accuracy summary the Arena
+ * renders.
  *
  * Everything is best-effort and pure: unmatched or still-scheduled predictions
  * are reported as "pending" rather than dropped, and nothing throws.

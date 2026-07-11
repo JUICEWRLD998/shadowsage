@@ -3,7 +3,7 @@
 /**
  * Sidebar — the chat page's context rail.
  *
- * One focused section: upcoming fixtures (real WorldCup26.ir data via
+ * One focused section: upcoming fixtures (football-data.org via
  * /api/matches). The user's prediction history lives on its own /calls page now,
  * so this rail stays single-purpose and uncluttered beside the conversation.
  *
@@ -23,7 +23,7 @@ import styles from "./Sidebar.module.css";
 
 export function Sidebar() {
   const [open, setOpen] = useState(false);
-  const { matches, loading: matchesLoading } = useUpcomingMatches(8);
+  const { matches, source, loading: matchesLoading } = useUpcomingMatches(8);
 
   // Close the mobile drawer on Escape for accessibility.
   useEffect(() => {
@@ -77,6 +77,11 @@ export function Sidebar() {
         <section className={styles.block}>
           <header className={styles.blockHead}>
             <h3 className={styles.title}>Upcoming fixtures</h3>
+            {!matchesLoading && matches.length > 0 && (
+              <span className={styles.count}>
+                {source === "fallback" ? "seeded" : matches.length}
+              </span>
+            )}
           </header>
           {matchesLoading ? (
             <div className={styles.list}>

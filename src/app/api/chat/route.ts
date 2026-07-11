@@ -9,7 +9,7 @@
  *
  * Phase 2 adds the memory loop around that stream:
  *   1. BEFORE streaming — recall the user's prediction history + silent bias
- *      notes from Walrus, and pull upcoming fixtures, then ground the prompt.
+ *      notes, and pull upcoming fixtures, then ground the prompt.
  *   2. AFTER streaming (onFinish) — extract any prediction the user just made,
  *      persist it, and (once enough exist) refresh the silent bias profile.
  * Every memory call degrades gracefully, so the chat works with or without
@@ -24,7 +24,7 @@ import {
 import { chatModel, isGeminiConfigured } from "@/lib/gemini";
 import { buildFriendlySystemPrompt } from "@/prompts/system";
 import {
-  getMatches,
+  getMatchFeed,
   getUpcomingMatches,
   formatMatchesForPrompt,
 } from "@/lib/worldcup";
@@ -94,16 +94,19 @@ export async function POST(req: Request) {
   // ── Ground the prompt in real memory + fixtures ──────────────────────────
   // All three are best-effort and run concurrently; any failure yields a safe
   // empty value so the companion still responds.
-  const [predictions, biasNotes, allMatches] = await Promise.all([
+  const [predictions, biasNotes, matchFeed] = await Promise.all([
     recallPredictions(undefined, 20, userId).catch(() => []),
     recallBiasNotes(10, userId).catch(() => ""),
-    getMatches().catch(() => []),
+    getMatchFeed(),
   ]);
 
   const recentPredictions = summarizePredictionsForPrompt(
     predictions.map((p) => p.raw),
   );
-  const upcomingMatches = formatMatchesForPrompt(getUpcomingMatches(allMatches));
+  const upcomingMatches = formatMatchesForPrompt(
+    getUpcomingMatches(matchFeed.matches),
+    { source: matchFeed.source },
+  );
 
   const system = buildFriendlySystemPrompt({
     recentPredictions: recentPredictions || undefined,
