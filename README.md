@@ -10,7 +10,7 @@ The new build targets the **QVAC** and **WDK** tracks:
 - **WDK secondary track:** wallet identity, signed prediction commitments, and USDt stake/tip flows are planned to use Tether's Wallet Development Kit.
 - **Football data:** fixtures and results are fetched through the existing football data adapter using `FOOTBALL_DATA_API_KEY`.
 
-This repository began as a previous hackathon project. For the Tether Developers Cup, the scored work is the ShadowSage pivot: replacing the old cloud-AI and Sui/Walrus assumptions with local QVAC intelligence and WDK self-custody.
+This repository began as a previous hackathon project. For the Tether Developers Cup, the scored work is the ShadowSage pivot: replacing the old cloud-AI, wallet, and remote-memory assumptions with local QVAC intelligence and WDK self-custody.
 
 ## What It Does
 
@@ -89,6 +89,16 @@ QVAC_TIMEOUT_MS=30000
 
 If the runtime or model is unavailable, chat and Shadow routes return recoverable errors and the chat page shows the QVAC status badge.
 
+## Local Memory
+
+Prediction history, bias profiles, Shadow state, conversation summaries, and later stake records are stored locally through `src/lib/memory.ts`. By default the demo writes to:
+
+```bash
+LOCAL_MEMORY_PATH=.shadowsage/memory.json
+```
+
+Records are scoped by the verified wallet/session address so one wallet's predictions and Shadow state do not bleed into another wallet.
+
 ## Outside Services
 
 - Submission disclosure: Outside service used: football fixture/result data via football-data.org. All AI runs locally through QVAC.
@@ -119,6 +129,9 @@ QVAC_CHAT_COMPLETIONS_PATH=/v1/chat/completions
 QVAC_MODEL_ID=your_local_qvac_model_id
 QVAC_TIMEOUT_MS=30000
 
+# Local wallet-scoped memory.
+LOCAL_MEMORY_PATH=.shadowsage/memory.json
+
 # Placeholder values until Phase 5 integration finalizes exact WDK requirements.
 WDK_NETWORK=testnet
 WDK_APP_ID=shadowsage
@@ -141,7 +154,7 @@ Open the local URL printed by Next.js, usually `http://localhost:3000`.
 
 ## Current Implementation Status
 
-Phase 1, Phase 2, and Phase 3 are complete: ShadowSage rebrand, Tether Developers Cup positioning, football-data.org fixture/result integration, fallback fixture behavior, match prompt formatting, and QVAC-only product AI routing are in place. The existing codebase still contains some previous wallet/memory integration code while WDK and local wallet-scoped memory are being integrated in later phases. See `implementation.md` for the full phased plan.
+Phase 1 through Phase 4 are complete: ShadowSage rebrand, football-data.org fixture/result integration, QVAC-only product AI routing, and local wallet-scoped memory are in place. The existing codebase still contains previous wallet integration code while WDK is being integrated in Phase 5. See `implementation.md` for the full phased plan.
 
 ## Project Structure
 

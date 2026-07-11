@@ -6,7 +6,7 @@
  * Stacks the three providers dapp-kit needs:
  *   - QueryClientProvider  (dapp-kit's hooks are built on react-query)
  *   - SuiClientProvider    (RPC endpoints; defaults to mainnet, the network the
- *                           app's Walrus/MemWal account lives on)
+ *                           app's local wallet-scoped memory lives on)
  *   - WalletProvider       (wallet discovery + connection, autoConnect on)
  *
  * Mounted once in the root layout, around everything. Client-only.

@@ -15,19 +15,14 @@ The core product loop stays strong: users make football predictions, local AI le
 
 ## Phase 1: Rebrand And Old-Stack Cleanup
 
-**Status: Complete.** Visible product copy, metadata, README positioning, navbar branding, auth-gate wording, and old-stack user-facing references have been updated for ShadowSage. Deeper Sui/MemWal internals remain intentionally in place until the dedicated WDK and local-memory phases.
+**Status: Complete.** Visible product copy, metadata, README positioning, navbar branding, auth-gate wording, and old-stack user-facing references have been updated for ShadowSage. Deeper Sui wallet internals remain intentionally in place until the dedicated WDK phase.
 
 - Rename visible product copy from **Shadow Pundit** to **ShadowSage**.
 - Replace old hackathon positioning with Tether Developers Cup positioning:
   - QVAC primary track
   - WDK secondary track
   - football prediction and fan stake product
-- Remove or replace user-facing references to:
-  - Walrus Memory
-  - Sui wallet
-  - Gemini
-  - OpenRouter
-  - MemWal
+- Remove or replace user-facing references to the old remote-memory, wallet, and cloud-AI stack.
 - Keep the existing app routes:
   - Home
   - Chat
@@ -93,7 +88,9 @@ The core product loop stays strong: users make football predictions, local AI le
 
 ## Phase 4: Local Wallet-Scoped Memory
 
-- Replace Walrus/MemWal-backed memory with local-first memory.
+**Status: Complete.** The memory backend now uses `src/lib/memory.ts`, a local JSON store scoped by verified wallet/session address. Existing helpers (`rememberAsync`, `recallMemories`, `scopeNs`, and `isMemoryConfigured`) are preserved for predictions, bias profiles, Shadow state, leaderboard rows, conversation summaries, and future stake records. The demo memory file defaults to `.shadowsage/memory.json` and is git-ignored.
+
+- Replace old remote-memory-backed storage with local-first memory.
 - Keep the existing helper shape where practical:
   - `rememberAsync`
   - `recallMemories`
@@ -205,13 +202,7 @@ The core product loop stays strong: users make football predictions, local AI le
   - attach USDt stake or signed stake intent
   - make enough predictions to trigger Shadow
   - view Arena/Profile
-- Confirm no user-facing references remain to:
-  - Shadow Pundit
-  - Sui
-  - Walrus
-  - Gemini
-  - OpenRouter
-  - MemWal
+- Confirm no user-facing references remain to the old product name, old wallet stack, old remote-memory stack, or old cloud-AI stack.
 - Confirm `.env.example` exists and `.env.local` remains ignored.
 - Confirm README lists outside services.
 - Confirm all AI behavior is QVAC-only.
@@ -230,7 +221,7 @@ The core product loop stays strong: users make football predictions, local AI le
 - Replace landing copy:
   - old: "The AI that spawns your evil twin"
   - new: "Local AI football predictions with self-custodial fan stakes"
-- Replace "Powered by Walrus Memory" copy with:
+- Replace old remote-memory powered copy with:
   - "Powered by QVAC local AI + WDK self-custody"
 - Replace "Connect Sui Wallet" with:
   - "Connect Wallet"

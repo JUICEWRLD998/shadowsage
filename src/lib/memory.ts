@@ -1,9 +1,9 @@
 /**
  * Local wallet-scoped memory.
  *
- * Phase 4 replaces Walrus/MemWal with a local-first store that persists JSON on
- * disk during local development/demo runs. Call sites keep the old helper shape
- * where practical: rememberAsync, recallMemories, scopeNs, isMemoryConfigured.
+ * Phase 4 uses a local-first store that persists JSON on disk during local
+ * development/demo runs. Call sites keep the established helper shape:
+ * rememberAsync, recallMemories, scopeNs, isMemoryConfigured.
  *
  * Server only - never import this into a client component.
  */
@@ -56,9 +56,6 @@ export function scopeNs(base: MemoryNamespace, userId?: string | null): ScopedNa
 export function isMemoryConfigured(): boolean {
   return true;
 }
-
-/** Compatibility alias while older call sites are being renamed. */
-export const isMemWalConfigured = isMemoryConfigured;
 
 async function readStore(): Promise<LocalMemoryFile> {
   try {
