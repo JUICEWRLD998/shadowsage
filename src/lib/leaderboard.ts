@@ -16,7 +16,7 @@
 
 import type { BiasType, LeaderboardEntry } from "@/types";
 
-/** The user's own numbers, distilled from their Walrus memory. */
+/** The user's own numbers, distilled from wallet-scoped memory. */
 export interface UserStats {
   userAccuracy: number; // %
   shadowAccuracy: number; // %
@@ -33,7 +33,7 @@ export interface UserStats {
  * wants them.
  */
 const RIVALS: Omit<LeaderboardEntry, "rank">[] = [
-  { userId: "r-aurelius", displayName: "Stoic Walrus", shadowAccuracy: 81, userAccuracy: 47, totalPredictions: 34, roastCount: 18, topBias: "star_player_bias", defianceRate: 22 },
+  { userId: "r-aurelius", displayName: "Stoic Sentinel", shadowAccuracy: 81, userAccuracy: 47, totalPredictions: 34, roastCount: 18, topBias: "star_player_bias", defianceRate: 22 },
   { userId: "r-nostromo", displayName: "Reckless Captain", shadowAccuracy: 73, userAccuracy: 58, totalPredictions: 27, roastCount: 11, topBias: "underdog_syndrome", defianceRate: 44 },
   { userId: "r-pandora", displayName: "Curious Box", shadowAccuracy: 62, userAccuracy: 59, totalPredictions: 30, roastCount: 9, topBias: "bandwagon_bias", defianceRate: 41 },
   { userId: "r-sisyphus", displayName: "Eternal Optimist", shadowAccuracy: 49, userAccuracy: 66, totalPredictions: 33, roastCount: 6, topBias: "group_stage_fatigue", defianceRate: 57 },
@@ -47,8 +47,8 @@ const NAME_ADJECTIVES = [
   "Wandering", "Vengeful", "Lucid", "Feral",
 ] as const;
 const NAME_NOUNS = [
-  "Walrus", "Oracle", "Captain", "Prophet", "Gambit", "Specter",
-  "Pundit", "Tactician", "Outsider", "Visionary", "Maverick", "Sentinel",
+  "Sentinel", "Oracle", "Captain", "Prophet", "Gambit", "Specter",
+  "Analyst", "Tactician", "Outsider", "Visionary", "Maverick", "Scout",
   "Diviner", "Strategist", "Contrarian", "Augur",
 ] as const;
 

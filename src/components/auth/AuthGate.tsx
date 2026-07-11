@@ -54,10 +54,10 @@ export function AuthGate({ children }: { children: ReactNode }) {
           <Ghost size={16} aria-hidden /> ShadowSage
         </span>
 
-        <h1 className={styles.title}>Connect to summon your Shadow</h1>
+        <h1 className={styles.title}>Connect your wallet</h1>
         <p className={styles.lede}>
           Your predictions, bias profile, and future USDt stake intents are
-          scoped to your wallet — sign in to keep ShadowSage personal.
+          scoped to this wallet. Sign in to keep ShadowSage personal.
         </p>
 
         <div className={styles.actions}>
@@ -86,7 +86,7 @@ export function AuthGate({ children }: { children: ReactNode }) {
         <p className={styles.fine}>
           Signing is free, proves you own the wallet, and never submits a
           transaction.{" "}
-          <span className={styles.walrus}>
+          <span className={styles.poweredBy}>
             Powered by QVAC local AI + WDK self-custody
           </span>
         </p>

@@ -1,7 +1,7 @@
 /**
  * PredictionCard — a single stored prediction, rendered on the /calls history
  * page. Presentational only; accepts already-parsed fields so it can show either
- * a freshly-made pick or one recalled from Walrus Memory.
+ * a freshly-made pick or one recalled from wallet-scoped memory.
  *
  * The recalled `match` is a plain "TeamA vs TeamB" string, so we split it and
  * resolve flags ourselves to keep the card visually consistent with fixtures.

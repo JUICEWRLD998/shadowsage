@@ -153,7 +153,7 @@ export const ShadowReportCard = forwardRef<HTMLDivElement, ReportCardData>(
 
         {/* Footer / branding */}
         <footer className={styles.footer}>
-          <span className={styles.walrus}>
+          <span className={styles.poweredBy}>
             Powered by QVAC local AI + WDK self-custody
           </span>
           <span className={styles.url}>shadowsage.vercel.app</span>

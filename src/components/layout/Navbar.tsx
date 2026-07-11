@@ -53,8 +53,8 @@ export function Navbar() {
       <div className={styles.inner}>
         <Link href="/" className={styles.brand} aria-label="ShadowSage home">
           <Image
-            src="/shadowpundit.png"
-            alt=""
+            src="/shadowsage-mark.png"
+            alt="ShadowSage"
             width={28}
             height={28}
             className={styles.brandLogo}

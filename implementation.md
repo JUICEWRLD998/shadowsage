@@ -15,6 +15,8 @@ The core product loop stays strong: users make football predictions, local AI le
 
 ## Phase 1: Rebrand And Old-Stack Cleanup
 
+**Status: Complete.** Visible product copy, metadata, README positioning, navbar branding, auth-gate wording, and old-stack user-facing references have been updated for ShadowSage. Deeper Sui/MemWal/Gemini internals remain intentionally in place until the dedicated QVAC, WDK, and local-memory phases.
+
 - Rename visible product copy from **Shadow Pundit** to **ShadowSage**.
 - Replace old hackathon positioning with Tether Developers Cup positioning:
   - QVAC primary track

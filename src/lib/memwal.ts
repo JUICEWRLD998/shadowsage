@@ -1,7 +1,8 @@
 /**
  * Walrus Memory (MemWal) — SDK singleton + ergonomic helpers.
  *
- * All persistent memory in Shadow Pundit lives here: predictions, bias
+ * Current persistent memory lives here until the local wallet-scoped store
+ * replaces it in the QVAC/WDK phases: predictions, bias
  * profiles, the Shadow's state, conversation summaries, and match results.
  * The SDK signs requests with an Ed25519 delegate key; the relayer (a TEE)
  * does encryption, embedding, and Walrus storage server-side.
@@ -56,7 +57,7 @@ export function getMemWal(): MemWal {
       key: process.env.MEMWAL_DELEGATE_KEY!,
       accountId: process.env.MEMWAL_ACCOUNT_ID!,
       serverUrl: process.env.MEMWAL_SERVER_URL || "https://relayer.memwal.ai",
-      namespace: process.env.MEMWAL_NAMESPACE || "shadowpundit",
+      namespace: process.env.MEMWAL_NAMESPACE || "shadowsage",
     });
   }
 

@@ -113,7 +113,7 @@ Open the local URL printed by Next.js, usually `http://localhost:3000`.
 
 ## Current Implementation Status
 
-Phase 1 is the ShadowSage rebrand and old-stack cleanup. The existing codebase still contains some previous integration code while QVAC, WDK, and local wallet-scoped memory are being integrated in later phases. See `implementation.md` for the full phased plan.
+Phase 1 is complete: ShadowSage rebrand, Tether Developers Cup positioning, metadata updates, and user-facing old-stack cleanup are done. The existing codebase still contains some previous integration code while QVAC, WDK, and local wallet-scoped memory are being integrated in later phases. See `implementation.md` for the full phased plan.
 
 ## Project Structure
 

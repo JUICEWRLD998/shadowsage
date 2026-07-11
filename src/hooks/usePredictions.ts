@@ -3,7 +3,7 @@
 /**
  * useRecentPredictions — client hook for the "your recent calls" rail.
  *
- * Reads the user's stored predictions back from Walrus Memory via
+ * Reads the user's stored predictions back from wallet-scoped memory via
  * /api/predictions. Returns newest-first records already shaped for display.
  * `refresh()` lets callers re-pull after a new prediction is likely stored.
  */

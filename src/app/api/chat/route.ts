@@ -71,7 +71,7 @@ export async function POST(req: Request) {
 
   if (!isGeminiConfigured()) {
     return Response.json(
-      { error: "The AI model isn't configured. Set OPENROUTER_KEY." },
+      { error: "The AI runtime isn't configured yet." },
       { status: 503 },
     );
   }

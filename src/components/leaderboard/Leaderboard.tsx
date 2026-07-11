@@ -177,7 +177,7 @@ export function Leaderboard() {
                 : youRank
                   ? `You're #${youRank} of ${entries.length}. This board ranks Shadows — beat yours consistently and you'll top Best Defiance instead.`
                   : "Make a few predictions in the chat and you'll join the field, ranked against every other Shadow."}
-              <span className={styles.walrus}>
+              <span className={styles.poweredBy}>
                 {" "}
                 · Powered by QVAC local AI + WDK self-custody
               </span>
