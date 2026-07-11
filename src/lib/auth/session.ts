@@ -8,7 +8,7 @@
  * cookie but never forge a different address into it.
  *
  * No database: the wallet address IS the account. Every memory namespace is
- * scoped by it (see lib/memwal `scopeNs`), which is what isolates one user's
+ * scoped by it (see lib/memory `scopeNs`), which is what isolates one user's
  * predictions / biases / Shadow from everyone else's.
  *
  * Server only.

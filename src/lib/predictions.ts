@@ -1,5 +1,5 @@
 /**
- * Prediction service — the bridge between extracted predictions, the Walrus
+ * Prediction service — the bridge between extracted predictions, the local
  * `predictions` namespace, and the rest of the app.
  *
  * Both the chat flow (auto-capture after a turn) and the /api/predictions route
@@ -18,7 +18,7 @@ import {
   parsePredictionMemory,
   type RecalledPrediction,
 } from "./predictionMemory";
-import { recallMemories, rememberAsync, isMemWalConfigured, scopeNs } from "./memwal";
+import { recallMemories, rememberAsync, isMemoryConfigured, scopeNs } from "./memory";
 
 /** Promote a loosely-extracted prediction into a full, persistable record. */
 export function buildPrediction(
@@ -42,15 +42,14 @@ export function buildPrediction(
 }
 
 /**
- * Persist a prediction to Walrus Memory (fire-and-forget — the relayer finishes
- * embedding/encrypting in the background). Returns false when memory isn't
- * configured or the relayer rejects the job, so callers can react if needed.
+ * Persist a prediction to local wallet-scoped memory. Returns false if the
+ * local write fails, so callers can react if needed.
  */
 export async function storePrediction(
   prediction: Prediction,
   userId?: string | null,
 ): Promise<boolean> {
-  if (!isMemWalConfigured()) return false;
+  if (!isMemoryConfigured()) return false;
   return rememberAsync(
     formatPredictionMemory(prediction),
     scopeNs("predictions", userId),

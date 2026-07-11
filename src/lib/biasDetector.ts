@@ -4,7 +4,7 @@
  *
  * Runs QVAC locally, validates the JSON with a constrained schema, then
  * enriches each raw finding into a full BiasProfile (human label,
- * description, severity tier + DNA colour) and persists it to the Walrus
+ * description, severity tier + DNA colour) and persists it to the local
  * `bias-profile` namespace. A recall helper summarises stored biases as the
  * "private notes" the friendly agent uses to steer its questions without ever
  * revealing them.
@@ -17,9 +17,9 @@ import { qvacGenerateObject } from "./qvac";
 import {
   recallMemories,
   rememberAsync,
-  isMemWalConfigured,
+  isMemoryConfigured,
   scopeNs,
-} from "./memwal";
+} from "./memory";
 import { buildBiasAnalysisPrompt } from "@/prompts/biasAnalysis";
 import type {
   BiasProfile,
@@ -166,12 +166,12 @@ function formatBiasMemory(b: BiasProfile): string {
   ].join("\n");
 }
 
-/** Persist detected biases to Walrus (fire-and-forget). Returns count stored. */
+/** Persist detected biases to local memory. Returns count stored. */
 export async function storeBiasProfiles(
   profiles: BiasProfile[],
   userId?: string | null,
 ): Promise<number> {
-  if (!isMemWalConfigured() || profiles.length === 0) return 0;
+  if (!isMemoryConfigured() || profiles.length === 0) return 0;
   const ns = scopeNs("bias-profile", userId);
   const results = await Promise.all(
     profiles.map((p) => rememberAsync(formatBiasMemory(p), ns)),
