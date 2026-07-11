@@ -1,5 +1,5 @@
 /* ============================================================================
-   SHADOW PUNDIT — TYPE SYSTEM
+   SHADOWSAGE — TYPE SYSTEM
    Single source of truth for every data model in the app.
    ========================================================================== */
 
@@ -118,6 +118,7 @@ export interface RoastPayload {
 // ==================== WORLD CUP DATA ====================
 
 export type MatchStatus = "scheduled" | "live" | "completed";
+export type MatchDataSource = "football-data" | "fallback";
 
 export interface WorldCupMatch {
   id: string;
@@ -134,6 +135,16 @@ export interface WorldCupMatch {
   score?: string;
   winner?: PickSide;
   group?: string;
+}
+
+export interface WorldCupMatchFeed {
+  matches: WorldCupMatch[];
+  source: MatchDataSource;
+  configured: boolean;
+  competition: string;
+  season: string;
+  updatedAt: string;
+  reason?: string;
 }
 
 export interface Team {
