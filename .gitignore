@@ -20,6 +20,9 @@
 # production
 /build
 
+# local demo data
+/.shadowsage/
+
 # misc
 .DS_Store
 *.pem

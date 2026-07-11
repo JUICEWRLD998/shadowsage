@@ -13,7 +13,7 @@
  * POST returns an empty result with a reason rather than calling the model.
  */
 
-import { isMemWalConfigured } from "@/lib/memwal";
+import { isMemoryConfigured } from "@/lib/memory";
 import { isQvacConfigured } from "@/lib/qvac";
 import { recallPredictions } from "@/lib/predictions";
 import { summarizePredictionsForPrompt } from "@/lib/predictionMemory";
@@ -36,7 +36,7 @@ export async function GET() {
     recallBiasNotes(10, auth),
     recallBiasProfiles(12, auth),
   ]);
-  return Response.json({ notes, profiles, configured: isMemWalConfigured() });
+  return Response.json({ notes, profiles, configured: isMemoryConfigured() });
 }
 
 export async function POST() {

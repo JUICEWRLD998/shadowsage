@@ -11,8 +11,8 @@
  *      notes, and pull upcoming fixtures, then ground the prompt.
  *   2. AFTER streaming (onFinish) — extract any prediction the user just made,
  *      persist it, and (once enough exist) refresh the silent bias profile.
- * Every memory call degrades gracefully, so the chat works with or without
- * MemWal configured.
+ * Every memory call degrades gracefully, so the chat works even when the local
+ * memory file is empty or temporarily unavailable.
  */
 
 import {

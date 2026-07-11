@@ -5,12 +5,12 @@
  *   1. EMERGENCE — decide when enough of the user exists in memory for a Shadow
  *      to be spawned (prediction volume + distinct biases).
  *   2. BIRTH — generate an adversarial personality from the user's real history
- *      and persist it to the Walrus `shadow-state` namespace.
+ *      and persist it to the local `shadow-state` namespace.
  *   3. VOICE — once active, generate the Shadow's in-chat interjections, grounded
  *      in that same history.
  *
- * Like the rest of the memory layer, every call degrades gracefully: a missing
- * or slow MemWal yields safe empties so the chat never breaks.
+ * Like the rest of the memory layer, every call degrades gracefully: local
+ * read/write failures yield safe empties so the chat never breaks.
  *
  * Server only.
  */
@@ -25,9 +25,9 @@ import {
 import {
   recallMemories,
   rememberAsync,
-  isMemWalConfigured,
+  isMemoryConfigured,
   scopeNs,
-} from "./memwal";
+} from "./memory";
 import { recallPredictions } from "./predictions";
 import { summarizePredictionsForPrompt } from "./predictionMemory";
 import { recallBiasNotes } from "./biasDetector";
@@ -165,34 +165,32 @@ function parseShadowMemory(raw: string): ShadowSnapshot | null {
 /**
  * Per-user in-memory cache of the last-good Shadow snapshot.
  *
- * Walrus/MemWal recall is slow and intermittently flaky (seconds-long reads,
- * occasional timeouts). When a recall failed OR came back suspiciously empty,
- * `getShadowSnapshot` used to return null — and the chat route reads null as
- * "the Shadow hasn't spawned" and stays silent. So a live Shadow would go quiet
- * purely because MemWal blipped.
+ * Even local reads can fail during file writes or process restarts. When recall
+ * fails OR comes back suspiciously empty, `getShadowSnapshot` would return null
+ * and the chat route would read that as "the Shadow hasn't spawned".
  *
  * This cache fixes that: a successful recall is remembered, a fresh hit skips
- * the slow round-trip entirely, and a failed/empty recall falls back to the
- * cached Shadow instead of going silent.
+ * disk entirely, and a failed/empty recall falls back to the cached Shadow
+ * instead of going silent.
  */
 interface CachedSnapshot {
   snap: ShadowSnapshot;
   ts: number;
 }
 const snapshotCache = new Map<string, CachedSnapshot>();
-/** Within this window, serve the cache without touching MemWal at all. */
+/** Within this window, serve the cache without touching disk at all. */
 const SNAPSHOT_FRESH_MS = 60_000;
 /** Beyond fresh, still fall back to a cached Shadow if recall fails/empties. */
 const SNAPSHOT_STALE_FALLBACK_MS = 30 * 60_000;
 
 const cacheKey = (userId?: string | null): string => userId ?? "__anon__";
 
-/** Record a known-good snapshot so transient MemWal failures don't silence it. */
+/** Record a known-good snapshot so transient read failures don't silence it. */
 function cacheSnapshot(userId: string | null | undefined, snap: ShadowSnapshot): void {
   snapshotCache.set(cacheKey(userId), { snap, ts: Date.now() });
 }
 
-/** Read the freshest snapshot Walrus will give us, ignoring parse failures. */
+/** Read the freshest snapshot local memory will give us, ignoring parse failures. */
 async function recallSnapshot(userId?: string | null): Promise<ShadowSnapshot | null> {
   const memories = await recallMemories(
     "the shadow's state, personality and emergence",
@@ -213,12 +211,12 @@ export async function getShadowSnapshot(
   const cached = snapshotCache.get(cacheKey(userId));
   const now = Date.now();
 
-  // Fast path: a recent success — skip the slow MemWal round-trip.
+  // Fast path: a recent success — skip disk I/O.
   if (cached && now - cached.ts < SNAPSHOT_FRESH_MS) {
     return cached.snap;
   }
 
-  // Try to refresh from Walrus. A throw and a "no snapshot" result are treated
+  // Try to refresh from local memory. A throw and a "no snapshot" result are treated
   // the same: both are reasons to fall back to cache rather than trust emptiness.
   let fresh: ShadowSnapshot | null = null;
   try {
@@ -232,7 +230,7 @@ export async function getShadowSnapshot(
     return fresh;
   }
 
-  // Recall failed or came back empty while MemWal is flaky. Don't silence a
+  // Recall failed or came back empty. Don't silence a
   // Shadow we've already seen — serve the last-good one if it's recent enough.
   if (cached && now - cached.ts < SNAPSHOT_STALE_FALLBACK_MS) {
     console.warn(
@@ -317,13 +315,12 @@ export async function emergeShadow(
     record: { wins: 0, losses: 0, draws: 0 },
   };
 
-  // Fire-and-forget; the Shadow is "born" the moment we return it to the client,
-  // and the relayer finishes persisting in the background.
-  if (isMemWalConfigured()) {
+  // Fire-and-forget; the Shadow is "born" the moment we return it to the client.
+  if (isMemoryConfigured()) {
     await rememberAsync(formatShadowMemory(snap), scopeNs("shadow-state", userId));
   }
 
-  // Seed the cache immediately: the Walrus write above is async and won't be
+  // Seed the cache immediately: the local write above may not be
   // recallable for a moment, so without this the first interjection right after
   // emergence could read an empty snapshot and stay silent.
   cacheSnapshot(userId, snap);

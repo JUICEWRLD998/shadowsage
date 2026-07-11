@@ -226,6 +226,7 @@ export type MemoryNamespace =
   | "bias-profile"
   | "shadow-state"
   | "conversations"
+  | "stakes"
   | "results"
   | "leaderboard";
 

@@ -6,11 +6,11 @@
  *
  *   → { roast: RoastPayload, target: { match, pick, actualScore } } | { roast: null, reason }
  *
- * Best-effort: needs MemWal configured, at least one wrong settled prediction,
+ * Best-effort: needs local memory, at least one wrong settled prediction,
  * and a working model. Any gap yields { roast: null, reason } rather than a 500.
  */
 
-import { isMemWalConfigured } from "@/lib/memwal";
+import { isMemoryConfigured } from "@/lib/memory";
 import { isQvacConfigured } from "@/lib/qvac";
 import { recallPredictions } from "@/lib/predictions";
 import { getMatches, getCompletedMatches } from "@/lib/worldcup";
@@ -25,7 +25,7 @@ export async function POST() {
   const auth = await requireSession();
   if (auth instanceof Response) return auth;
 
-  if (!isMemWalConfigured()) {
+  if (!isMemoryConfigured()) {
     return Response.json({ roast: null, reason: "Memory not configured." });
   }
 

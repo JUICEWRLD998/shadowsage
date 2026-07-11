@@ -1,9 +1,8 @@
 /**
- * Prediction ⇄ Walrus-memory serialization.
+ * Prediction ⇄ local-memory serialization.
  *
- * Memories on Walrus are plain natural-language text (the relayer embeds them
- * for semantic recall), so we store each prediction as a structured, human- and
- * model-readable block. Keeping the read/write format in one module means the
+ * Memories are stored as compact text blocks plus local metadata, so each
+ * prediction remains human- and model-readable. Keeping the read/write format in one module means the
  * shape can evolve without hunting through routes.
  */
 

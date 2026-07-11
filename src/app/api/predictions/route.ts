@@ -9,13 +9,13 @@
  *        Stores a structured prediction directly (used by UI surfaces that let
  *        the user log a pick explicitly, rather than via chat).
  *
- * Memory is best-effort: when MemWal isn't configured, GET returns an empty
- * list and POST reports stored:false instead of failing the request.
+ * Memory is best-effort: GET returns an empty list when local memory has no
+ * records, and POST reports stored:false if the local write fails.
  */
 
 import { z } from "zod";
 import type { PickSide } from "@/types";
-import { isMemWalConfigured } from "@/lib/memwal";
+import { isMemoryConfigured } from "@/lib/memory";
 import {
   buildPrediction,
   recallPredictions,
@@ -39,7 +39,7 @@ export async function GET(req: Request) {
   return Response.json({
     predictions,
     count: predictions.length,
-    memoryConfigured: isMemWalConfigured(),
+    memoryConfigured: isMemoryConfigured(),
   });
 }
 

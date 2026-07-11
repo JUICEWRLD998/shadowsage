@@ -13,7 +13,7 @@
  *         Generate the Shadow's in-chat interjection for the given conversation.
  *         Empty text means it chose to stay silent.
  *
- * Everything degrades gracefully when MemWal / QVAC is unavailable.
+ * Everything degrades gracefully when local memory / QVAC is unavailable.
  */
 
 import type { UIMessage } from "ai";

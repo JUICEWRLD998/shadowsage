@@ -6,11 +6,11 @@
  *
  * Pulls the user's stored predictions, resolves each against real completed
  * World Cup fixtures, and pairs the result with the Shadow's win record. Memory
- * is best-effort: with MemWal unconfigured this returns an empty, zeroed board
+ * is best-effort: with empty local memory this returns an empty, zeroed board
  * instead of failing, so the Arena always renders.
  */
 
-import { isMemWalConfigured } from "@/lib/memwal";
+import { isMemoryConfigured } from "@/lib/memory";
 import { recallPredictions } from "@/lib/predictions";
 import { getMatches, getCompletedMatches } from "@/lib/worldcup";
 import { resolveAll, summarize } from "@/lib/scoring";
@@ -51,6 +51,6 @@ export async function GET() {
     resolved,
     summary,
     shadow: shadowBlock,
-    configured: isMemWalConfigured(),
+    configured: isMemoryConfigured(),
   });
 }

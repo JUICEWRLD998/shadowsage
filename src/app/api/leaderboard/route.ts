@@ -3,14 +3,14 @@
  *
  *   GET → { entries: LeaderboardEntry[], categories, youRank, configured }
  *
- * On each load the caller's row is recomputed from their Walrus memory (accuracy,
+ * On each load the caller's row is recomputed from local memory (accuracy,
  * Shadow record, top bias) and written to a GLOBAL `leaderboard` namespace — one
  * row per wallet, latest-wins. We then recall every row and rank real connected
  * users against each other, padded with a deterministic field of seeded rivals
  * (see lib/leaderboard.ts) so the board always looks alive. Requires a session.
  */
 
-import { isMemWalConfigured, recallMemories, rememberAsync } from "@/lib/memwal";
+import { isMemoryConfigured, recallMemories, rememberAsync } from "@/lib/memory";
 import { recallPredictions } from "@/lib/predictions";
 import { getMatches, getCompletedMatches } from "@/lib/worldcup";
 import { resolveAll, summarize } from "@/lib/scoring";
@@ -31,7 +31,7 @@ export async function GET() {
   const auth = await requireSession();
   if (auth instanceof Response) return auth;
 
-  const configured = isMemWalConfigured();
+  const configured = isMemoryConfigured();
 
   // 1. Recompute the caller's own stats from their (per-user) memory.
   if (configured) {
