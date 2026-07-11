@@ -66,7 +66,7 @@ try {
 // ---- 2. Local memory -------------------------------------------------------
 line("\n=== 2. Local wallet-scoped memory ===");
 try {
-  const memoryPath = process.env.LOCAL_MEMORY_PATH || ".shadowsage/memory.json";
+  const memoryPath = `.shadowsage/${process.env.LOCAL_MEMORY_FILE || "memory.json"}`;
   line(`  ✓ local memory path: ${memoryPath}`);
   line("  ✓ no external memory service required");
 } catch (e) {

@@ -94,7 +94,7 @@ If the runtime or model is unavailable, chat and Shadow routes return recoverabl
 Prediction history, bias profiles, Shadow state, conversation summaries, and later stake records are stored locally through `src/lib/memory.ts`. By default the demo writes to:
 
 ```bash
-LOCAL_MEMORY_PATH=.shadowsage/memory.json
+LOCAL_MEMORY_FILE=memory.json
 ```
 
 Records are scoped by the verified wallet/session address so one wallet's predictions and Shadow state do not bleed into another wallet.
@@ -130,7 +130,7 @@ QVAC_MODEL_ID=your_local_qvac_model_id
 QVAC_TIMEOUT_MS=30000
 
 # Local wallet-scoped memory.
-LOCAL_MEMORY_PATH=.shadowsage/memory.json
+LOCAL_MEMORY_FILE=memory.json
 
 # Placeholder values until Phase 5 integration finalizes exact WDK requirements.
 WDK_NETWORK=testnet

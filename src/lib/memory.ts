@@ -31,16 +31,16 @@ interface LocalMemoryFile {
   records: LocalMemoryRecord[];
 }
 
-const DEFAULT_RELATIVE_PATH = path.join(".shadowsage", "memory.json");
+const LOCAL_MEMORY_DIR = ".shadowsage";
+const DEFAULT_MEMORY_FILE = "memory.json";
 const MAX_RECORDS_PER_NAMESPACE = 500;
 
 let writeQueue: Promise<unknown> = Promise.resolve();
 
 function memoryPath(): string {
-  return path.resolve(
-    process.cwd(),
-    process.env.LOCAL_MEMORY_PATH || DEFAULT_RELATIVE_PATH,
-  );
+  const configured = process.env.LOCAL_MEMORY_FILE || process.env.LOCAL_MEMORY_PATH;
+  const fileName = configured ? path.basename(configured) : DEFAULT_MEMORY_FILE;
+  return path.join(process.cwd(), LOCAL_MEMORY_DIR, fileName);
 }
 
 /**
