@@ -14,8 +14,7 @@
  */
 
 import { usePathname } from "next/navigation";
-import { ConnectButton, useCurrentAccount } from "@mysten/dapp-kit";
-import { Ghost, Loader2, ShieldAlert } from "lucide-react";
+import { Ghost, Loader2, ShieldAlert, Wallet } from "lucide-react";
 import type { ReactNode } from "react";
 import { useAuth } from "@/context/AuthContext";
 import styles from "./AuthGate.module.css";
@@ -29,8 +28,7 @@ function isPublic(pathname: string): boolean {
 
 export function AuthGate({ children }: { children: ReactNode }) {
   const pathname = usePathname();
-  const { address, status, error, signIn } = useAuth();
-  const account = useCurrentAccount();
+  const { address, walletAddress, status, error, connectWallet, signIn } = useAuth();
 
   // Landing page is always open; verified sessions pass through everywhere.
   if (isPublic(pathname) || (status === "authenticated" && address)) {
@@ -54,16 +52,26 @@ export function AuthGate({ children }: { children: ReactNode }) {
           <Ghost size={16} aria-hidden /> ShadowSage
         </span>
 
-        <h1 className={styles.title}>Connect your wallet</h1>
+        <h1 className={styles.title}>Connect your Tether-compatible wallet</h1>
         <p className={styles.lede}>
-          Your predictions, bias profile, and future USDt stake intents are
-          scoped to this wallet. Sign in to keep ShadowSage personal.
+          Your predictions, bias profile, and USDt stake intents are scoped to
+          this wallet. ShadowSage uses WDK self-custodial wallets — your keys
+          never leave your device.
         </p>
 
         <div className={styles.actions}>
-          <ConnectButton connectText="Connect Wallet" />
+          {!walletAddress && (
+            <button
+              className={styles.signBtn}
+              onClick={() => void connectWallet()}
+              disabled={status === "signing"}
+            >
+              <Wallet size={16} aria-hidden />
+              Create or Restore Wallet
+            </button>
+          )}
 
-          {account && status !== "signing" && (
+          {walletAddress && status !== "signing" && (
             <button className={styles.signBtn} onClick={() => void signIn()}>
               Sign to enter
             </button>
@@ -72,7 +80,7 @@ export function AuthGate({ children }: { children: ReactNode }) {
           {status === "signing" && (
             <span className={styles.signing}>
               <Loader2 className={styles.spinner} size={16} aria-hidden />
-              Check your wallet to sign…
+              Signing message…
             </span>
           )}
         </div>
@@ -80,6 +88,12 @@ export function AuthGate({ children }: { children: ReactNode }) {
         {status === "error" && error && (
           <p className={styles.error}>
             <ShieldAlert size={15} aria-hidden /> {error}
+          </p>
+        )}
+
+        {walletAddress && (
+          <p className={styles.muted}>
+            Connected: {walletAddress.slice(0, 6)}…{walletAddress.slice(-4)}
           </p>
         )}
 

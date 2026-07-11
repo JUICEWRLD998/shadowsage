@@ -1,16 +1,16 @@
 /**
  * POST /api/auth/verify — prove wallet ownership, open a session.
  *
- * Body: { address, bytes, signature } where `bytes`/`signature` come from the
- * wallet's signPersonalMessage. We rebuild the message from the pending nonce
- * cookie, cryptographically verify the signature, confirm the recovered public
- * key actually owns `address`, then set the session cookie.
+ * Body: { address, signature } where `signature` is a hex-encoded Ethereum
+ * personal_sign signature (EIP-191). We rebuild the message from the pending
+ * nonce cookie, cryptographically verify the signature, recover the signer
+ * address, and confirm it matches the claimed `address`.
  *
  * The address is NEVER trusted from the client alone — only after the signature
  * checks out. This is the real security boundary of the app.
  */
 
-import { verifyPersonalMessageSignature } from "@mysten/sui/verify";
+import { verifyMessage } from "ethers";
 import {
   buildSignInMessage,
   clearNonceCookie,
@@ -20,9 +20,7 @@ import { setSessionCookie } from "@/lib/auth/session";
 
 interface VerifyBody {
   address?: string;
-  /** Base64 message bytes returned by the wallet (must match our nonce message). */
-  bytes?: string;
-  /** Base64 signature returned by the wallet. */
+  /** Hex-encoded signature from wallet (EIP-191 personal_sign). */
   signature?: string;
 }
 
@@ -50,20 +48,19 @@ export async function POST(req: Request) {
     );
   }
 
-  // Rebuild the exact message we expect was signed (don't trust client `bytes`).
+  // Rebuild the exact message we expect was signed.
   const expectedMessage = buildSignInMessage(nonce);
-  const messageBytes = new TextEncoder().encode(expectedMessage);
 
   try {
-    const publicKey = await verifyPersonalMessageSignature(
-      messageBytes,
-      signature,
-      { address },
-    );
+    // Recover the signer address from the signature using ethers.js
+    // verifyMessage handles EIP-191 prefixing internally
+    const recoveredAddress = verifyMessage(expectedMessage, signature);
 
-    // verifyPersonalMessageSignature already checks the sig against `address`,
-    // but assert the recovered key maps to the claimed address as defence in depth.
-    if (publicKey.toSuiAddress() !== address) {
+    // Compare recovered address to claimed address (case-insensitive)
+    if (recoveredAddress.toLowerCase() !== address.toLowerCase()) {
+      console.error(
+        `[/api/auth/verify] Address mismatch: claimed=${address}, recovered=${recoveredAddress}`,
+      );
       return Response.json(
         { error: "Signature does not match the provided address." },
         { status: 401 },

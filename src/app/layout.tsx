@@ -1,7 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Inter, Outfit, JetBrains_Mono } from "next/font/google";
 import { Navbar } from "@/components/layout/Navbar";
-import { SuiProvider } from "@/components/providers/SuiProvider";
 import { AuthProvider } from "@/context/AuthContext";
 import { AuthGate } from "@/components/auth/AuthGate";
 import "./globals.css";
@@ -89,14 +88,12 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <body suppressHydrationWarning>
-        <SuiProvider>
-          <AuthProvider>
-            <Navbar />
-            <div className="app-shell">
-              <AuthGate>{children}</AuthGate>
-            </div>
-          </AuthProvider>
-        </SuiProvider>
+        <AuthProvider>
+          <Navbar />
+          <div className="app-shell">
+            <AuthGate>{children}</AuthGate>
+          </div>
+        </AuthProvider>
       </body>
     </html>
   );
