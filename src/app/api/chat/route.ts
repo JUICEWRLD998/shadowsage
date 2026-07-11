@@ -1,5 +1,5 @@
 /**
- * POST /api/chat — streaming conversation with the ShadowPundit companion.
+ * POST /api/chat — streaming conversation with the ShadowSage companion.
  *
  * AI SDK v6 contract:
  *   - The client (useChat) sends `{ messages: UIMessage[] }`.

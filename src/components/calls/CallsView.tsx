@@ -3,7 +3,7 @@
 /**
  * CallsView — the full prediction-history surface for /calls.
  *
- * Pulls every stored pick back from Walrus Memory (newest first) and lays them
+ * Pulls every stored pick back from wallet-scoped memory (newest first) and lays them
  * out as a responsive grid of PredictionCards. This is the home for the user's
  * track record, moved out of the chat sidebar so the conversation stays focused.
  */
@@ -29,7 +29,7 @@ export function CallsView() {
             </p>
             <h1 className={styles.title}>Your calls</h1>
             <p className={styles.lede}>
-              Every prediction you&apos;ve made, recalled from Walrus Memory.
+              Every prediction you&apos;ve made, ready for QVAC-powered local recall.
               Your Shadow studies these — and it never forgets.
             </p>
           </div>
@@ -71,7 +71,7 @@ export function CallsView() {
             <h2 className={styles.emptyTitle}>No calls yet</h2>
             <p className={styles.emptyBody}>
               Head to the chat and make your first prediction — who wins, the
-              score, and why. It&apos;ll show up here, remembered forever.
+              score, and why. It&apos;ll show up here for your Shadow to study.
             </p>
             <Link href="/chat" className={styles.cta}>
               Make your first call

@@ -26,7 +26,7 @@ interface MessageBubbleProps {
 
 const ROLE_LABEL: Record<ChatRole, string> = {
   user: "You",
-  assistant: "ShadowPundit",
+  assistant: "ShadowSage",
   shadow: "The Shadow",
 };
 

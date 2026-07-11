@@ -173,11 +173,14 @@ export function Leaderboard() {
 
             <p className={styles.note}>
               {!configured
-                ? "Connect your Sui wallet to enter the field — your stats rank in live."
+                ? "Connect your wallet to enter the field — your stats rank in live."
                 : youRank
                   ? `You're #${youRank} of ${entries.length}. This board ranks Shadows — beat yours consistently and you'll top Best Defiance instead.`
                   : "Make a few predictions in the chat and you'll join the field, ranked against every other Shadow."}
-              <span className={styles.walrus}> · Powered by Walrus Memory 🦭</span>
+              <span className={styles.walrus}>
+                {" "}
+                · Powered by QVAC local AI + WDK self-custody
+              </span>
             </p>
           </>
         )}

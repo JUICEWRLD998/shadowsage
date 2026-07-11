@@ -1,7 +1,7 @@
 /**
  * Session — the server's source of truth for "who is this request".
  *
- * Identity is a Sui wallet address, proven once via a signed nonce (see
+ * Identity is a wallet address, proven once via a signed nonce (see
  * /api/auth/verify) and then carried in a tamper-proof, httpOnly cookie. The
  * cookie value is `<base64url(payload)>.<base64url(hmac)>`, where the HMAC is
  * SHA-256 over the payload keyed by SESSION_SECRET — so a client can read the
@@ -125,7 +125,7 @@ export async function requireSession(): Promise<string | Response> {
   const address = await getSessionAddress();
   if (!address) {
     return Response.json(
-      { error: "Not authenticated. Connect your Sui wallet." },
+      { error: "Not authenticated. Connect your wallet." },
       { status: 401 },
     );
   }

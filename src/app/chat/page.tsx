@@ -6,7 +6,7 @@ import styles from "./chat.module.css";
 export const metadata: Metadata = {
   title: "Chat",
   description:
-    "Talk through your World Cup 2026 predictions with the ShadowPundit companion.",
+    "Talk through your World Cup 2026 predictions with the ShadowSage companion.",
 };
 
 export default function ChatPage() {

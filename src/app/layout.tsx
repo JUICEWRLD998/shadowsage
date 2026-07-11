@@ -29,35 +29,37 @@ const jetbrainsMono = JetBrains_Mono({
   variable: "--font-mono-src",
 });
 
-const APP_URL = process.env.NEXT_PUBLIC_APP_URL || "https://shadowpundit.vercel.app";
-const TITLE = "Shadow Pundit — The AI that spawns your evil twin";
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL || "https://shadowsage.vercel.app";
+const TITLE = "ShadowSage — Local AI football predictions";
 const DESCRIPTION =
-  "An AI World Cup 2026 companion that learns your cognitive biases and spawns an adversarial Shadow twin — arguing against your every pick using your own history as ammunition. Powered by Walrus Memory.";
+  "A QVAC-powered football prediction companion that learns your bias locally, spawns an adversarial Shadow, and prepares self-custodial USDt fan stakes with WDK.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(APP_URL),
   title: {
     default: TITLE,
-    template: "%s · Shadow Pundit",
+    template: "%s · ShadowSage",
   },
   description: DESCRIPTION,
-  applicationName: "Shadow Pundit",
+  applicationName: "ShadowSage",
   keywords: [
     "World Cup 2026",
-    "AI prediction",
-    "Walrus Memory",
+    "local AI prediction",
+    "QVAC",
+    "WDK",
+    "USDt",
     "cognitive bias",
     "football predictions",
-    "Shadow Pundit",
+    "ShadowSage",
   ],
-  authors: [{ name: "Shadow Pundit" }],
+  authors: [{ name: "ShadowSage" }],
   openGraph: {
     type: "website",
     url: APP_URL,
     title: TITLE,
     description: DESCRIPTION,
-    siteName: "Shadow Pundit",
-    images: [{ url: "/og-image.png", width: 1200, height: 630, alt: "Shadow Pundit" }],
+    siteName: "ShadowSage",
+    images: [{ url: "/og-image.png", width: 1200, height: 630, alt: "ShadowSage" }],
   },
   twitter: {
     card: "summary_large_image",

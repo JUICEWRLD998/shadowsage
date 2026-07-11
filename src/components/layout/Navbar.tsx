@@ -51,7 +51,7 @@ export function Navbar() {
   return (
     <header className={styles.nav}>
       <div className={styles.inner}>
-        <Link href="/" className={styles.brand} aria-label="Shadow Pundit home">
+        <Link href="/" className={styles.brand} aria-label="ShadowSage home">
           <Image
             src="/shadowpundit.png"
             alt=""
@@ -61,7 +61,7 @@ export function Navbar() {
             priority
           />
           <span className={styles.brandText}>
-            Shadow<span className={styles.brandTextAccent}>Pundit</span>
+            Shadow<span className={styles.brandTextAccent}>Sage</span>
           </span>
         </Link>
 

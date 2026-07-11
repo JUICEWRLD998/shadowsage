@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * AuthGate — the "connect your Sui wallet to enter" wall.
+ * AuthGate — the wallet connection wall.
  *
  * Wraps the app's protected surfaces. The landing page (/) stays public so
  * first-time visitors can read the pitch before connecting. Everywhere else,
@@ -51,17 +51,17 @@ export function AuthGate({ children }: { children: ReactNode }) {
     <div className={styles.wrap}>
       <div className={styles.card}>
         <span className={styles.badge}>
-          <Ghost size={16} aria-hidden /> Shadow Pundit
+          <Ghost size={16} aria-hidden /> ShadowSage
         </span>
 
         <h1 className={styles.title}>Connect to summon your Shadow</h1>
         <p className={styles.lede}>
-          Your predictions, biases, and Shadow are bound to your Sui wallet — sign
-          in to unlock <em>your</em> memory and keep it yours alone.
+          Your predictions, bias profile, and future USDt stake intents are
+          scoped to your wallet — sign in to keep ShadowSage personal.
         </p>
 
         <div className={styles.actions}>
-          <ConnectButton connectText="Connect Sui Wallet" />
+          <ConnectButton connectText="Connect Wallet" />
 
           {account && status !== "signing" && (
             <button className={styles.signBtn} onClick={() => void signIn()}>
@@ -85,7 +85,10 @@ export function AuthGate({ children }: { children: ReactNode }) {
 
         <p className={styles.fine}>
           Signing is free, proves you own the wallet, and never submits a
-          transaction. <span className={styles.walrus}>Powered by Walrus Memory 🦭</span>
+          transaction.{" "}
+          <span className={styles.walrus}>
+            Powered by QVAC local AI + WDK self-custody
+          </span>
         </p>
       </div>
     </div>

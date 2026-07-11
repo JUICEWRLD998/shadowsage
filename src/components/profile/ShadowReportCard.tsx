@@ -58,7 +58,7 @@ export const ShadowReportCard = forwardRef<HTMLDivElement, ReportCardData>(
       <div ref={ref} className={styles.card}>
         {/* Header */}
         <header className={styles.header}>
-          <p className={styles.brandKicker}>Shadow Pundit</p>
+          <p className={styles.brandKicker}>ShadowSage</p>
           <h2 className={styles.brandTitle}>Report Card</h2>
         </header>
 
@@ -153,8 +153,10 @@ export const ShadowReportCard = forwardRef<HTMLDivElement, ReportCardData>(
 
         {/* Footer / branding */}
         <footer className={styles.footer}>
-          <span className={styles.walrus}>Powered by Walrus Memory 🦭</span>
-          <span className={styles.url}>shadowpundit.vercel.app</span>
+          <span className={styles.walrus}>
+            Powered by QVAC local AI + WDK self-custody
+          </span>
+          <span className={styles.url}>shadowsage.vercel.app</span>
         </footer>
       </div>
     );

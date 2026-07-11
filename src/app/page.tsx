@@ -31,8 +31,8 @@ const FEATURES = [
   },
   {
     icon: Database,
-    title: "Remembered forever",
-    body: "Nothing is stored in a database you control. It all lives on Walrus decentralized memory — leave for a month, come back, your Shadow remembers everything.",
+    title: "Local memory, wallet scoped",
+    body: "Your prediction history and bias profile stay tied to your wallet identity, ready for QVAC to recall without sending your reasoning to cloud AI.",
   },
 ] as const;
 
@@ -63,20 +63,22 @@ export default function Home() {
         <div className={`u-container ${styles.heroInner}`}>
           <span className={styles.badge}>
             <Ghost size={14} aria-hidden />
-            Walrus Memory · World Cup 2026
+            QVAC Local AI · WDK Wallets · World Cup 2026
           </span>
 
           <h1 className={styles.title}>
-            The AI that spawns
+            Local AI football predictions
             <br />
-            <span className="u-gradient-text u-shimmer">your evil twin.</span>
+            <span className="u-gradient-text u-shimmer">
+              with self-custodial fan stakes.
+            </span>
           </h1>
 
           <p className={styles.lede}>
-            Shadow Pundit is a World Cup companion with a secret. It tracks your
-            predictions, learns your cognitive biases, and breeds an adversarial
-            Shadow that argues against every pick you make — using your own
-            history as ammunition.
+            ShadowSage is a World Cup companion for serious football takes. QVAC
+            analyses your prediction patterns locally, your Shadow challenges
+            weak calls, and WDK lets you back conviction with self-custodial
+            USDt flows.
           </p>
 
           <div className={styles.ctas}>
@@ -175,7 +177,9 @@ export default function Home() {
         <div className="u-container">
           <Reveal className={styles.sectionHead}>
             <h2>How the Shadow is born</h2>
-            <p className="u-muted">Three steps from friendly chat to evil twin.</p>
+            <p className="u-muted">
+              Three steps from friendly chat to a local adversary.
+            </p>
           </Reveal>
 
           <Stagger className={styles.steps} stagger={0.12}>
@@ -204,7 +208,9 @@ export default function Home() {
             Make your first prediction
             <ArrowRight size={18} aria-hidden />
           </Link>
-          <p className={styles.poweredBy}>Powered by Walrus Memory 🦭</p>
+          <p className={styles.poweredBy}>
+            Powered by QVAC local AI + WDK self-custody
+          </p>
         </Reveal>
       </section>
     </main>

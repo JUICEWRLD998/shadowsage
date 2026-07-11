@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * AuthContext — bridges the connected Sui wallet to a verified server session.
+ * AuthContext — bridges the connected wallet to a verified server session.
  *
  * The wallet being *connected* (dapp-kit) is not the same as being *signed in*
  * (our httpOnly session cookie). This context owns that gap:

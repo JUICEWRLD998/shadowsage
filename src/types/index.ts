@@ -209,7 +209,7 @@ export interface AppState {
 
 // ==================== MEMORY ====================
 
-/** Walrus Memory namespaces — one bucket per data domain. */
+/** Memory namespaces — one bucket per data domain. */
 export type MemoryNamespace =
   | "predictions"
   | "bias-profile"
@@ -220,8 +220,8 @@ export type MemoryNamespace =
 
 // ==================== AUTH ====================
 
-/** The verified identity behind a request — a Sui wallet address. */
+/** The verified identity behind a request — a wallet address. */
 export interface SessionUser {
-  /** Lower-cased Sui wallet address; doubles as the memory-scoping key. */
+  /** Lower-cased wallet address; doubles as the memory-scoping key. */
   address: string;
 }

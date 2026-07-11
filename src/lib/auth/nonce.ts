@@ -29,7 +29,7 @@ export function generateNonce(): string {
  */
 export function buildSignInMessage(nonce: string): string {
   return [
-    "Shadow Pundit — sign in",
+    "ShadowSage - sign in",
     "",
     "Sign this message to prove you control this wallet and unlock your Shadow.",
     "This is free and will not submit a transaction.",
