@@ -1,0 +1,21 @@
+/* Hosts the WebGL hero canvas behind the hero content. The canvas itself is
+   position:absolute inset:0 (set in HeroCanvas); this wrap sets the stacking
+   layer and masks it softly into the page. */
+
+.wrap {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.9;
+  /* Fade the field out toward the edges so it blends with the mesh background. */
+  -webkit-mask-image: radial-gradient(120% 100% at 50% 35%, #000 55%, transparent 100%);
+  mask-image: radial-gradient(120% 100% at 50% 35%, #000 55%, transparent 100%);
+  animation: heroFade 1.2s var(--ease-out-expo) both;
+}
+
+@keyframes heroFade {
+  from {
+    opacity: 0;
+  }
+}

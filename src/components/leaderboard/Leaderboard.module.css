@@ -1,0 +1,318 @@
+.page {
+  padding-block: var(--sp-12) var(--sp-20);
+}
+
+/* ---- Header --------------------------------------------------------------- */
+
+.head {
+  margin-bottom: var(--sp-10);
+}
+.kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  margin-bottom: var(--sp-3);
+  font-family: var(--font-mono);
+  font-size: var(--step--1);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--shadow-300);
+}
+.title {
+  font-size: var(--step-4);
+  margin-bottom: var(--sp-3);
+}
+.lede {
+  max-width: 60ch;
+  color: var(--text-muted);
+  line-height: 1.6;
+}
+
+/* ---- Champion cards ------------------------------------------------------- */
+
+.champGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--sp-4);
+  margin-bottom: var(--sp-10);
+}
+
+.champ {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+  padding: var(--sp-5) var(--sp-5);
+  border-radius: var(--r-lg);
+  border: 1px solid var(--border);
+  background: var(--surface-1);
+  overflow: hidden;
+}
+.champ::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.55;
+}
+.champ_shadow {
+  border-color: var(--border-shadow);
+}
+.champ_shadow::before {
+  background: radial-gradient(
+    80% 60% at 50% 0%,
+    oklch(0.5 0.2 295 / 0.16),
+    transparent 70%
+  );
+}
+.champ_you {
+  border-color: var(--border-you);
+}
+.champ_you::before {
+  background: radial-gradient(
+    80% 60% at 50% 0%,
+    oklch(0.56 0.16 250 / 0.16),
+    transparent 70%
+  );
+}
+.champ_gold {
+  border-color: oklch(0.8 0.13 85 / 0.4);
+}
+.champ_gold::before {
+  background: radial-gradient(
+    80% 60% at 50% 0%,
+    oklch(0.8 0.13 85 / 0.16),
+    transparent 70%
+  );
+}
+
+.champLabel {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  font-family: var(--font-mono);
+  font-size: var(--step--1);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+.champ_shadow .champLabel {
+  color: var(--shadow-300);
+}
+.champ_you .champLabel {
+  color: var(--you-300);
+}
+.champ_gold .champLabel {
+  color: var(--gold);
+}
+.champName {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--step-2);
+}
+.champStat {
+  font-family: var(--font-mono);
+  font-size: var(--step--1);
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.youTag {
+  display: inline-flex;
+  align-items: center;
+  padding: 1px 7px;
+  border-radius: var(--r-full);
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--you-300);
+  background: oklch(0.56 0.16 250 / 0.16);
+  border: 1px solid var(--border-you);
+}
+
+/* ---- Table ---------------------------------------------------------------- */
+
+.tableCard {
+  border-radius: var(--r-lg);
+  border: 1px solid var(--border);
+  background: var(--surface-1);
+  overflow: hidden;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 36px minmax(0, 1.6fr) repeat(2, 64px) repeat(2, 56px) 1.1fr 72px;
+  align-items: center;
+  gap: var(--sp-3);
+  padding: var(--sp-4) var(--sp-5);
+  border-top: 1px solid var(--border);
+}
+.row:first-child {
+  border-top: none;
+}
+
+.headerRow {
+  font-family: var(--font-mono);
+  font-size: var(--step--1);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  background: var(--surface-2);
+}
+
+.youRow {
+  background: oklch(0.56 0.16 250 / 0.08);
+  border-left: 3px solid var(--you-400);
+}
+.topRow .cRank {
+  color: var(--gold);
+}
+
+.cRank {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-muted);
+  display: inline-flex;
+  align-items: center;
+}
+.cName {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  min-width: 0;
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.cNum {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+  color: var(--text);
+}
+.shadowNum {
+  color: var(--shadow-300);
+  font-weight: 600;
+}
+.youNum {
+  color: var(--you-300);
+  font-weight: 600;
+}
+.cBias {
+  font-size: var(--step--1);
+  color: var(--text-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ---- Note ----------------------------------------------------------------- */
+
+.note {
+  margin-top: var(--sp-6);
+  font-size: var(--step--1);
+  color: var(--text-muted);
+  line-height: 1.6;
+}
+.walrus {
+  color: var(--text-faint);
+}
+
+/* ---- Skeleton ------------------------------------------------------------- */
+
+.skeletonWrap {
+  display: flex;
+  flex-direction: column;
+}
+.champGridSkeleton {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--sp-4);
+  margin-bottom: var(--sp-10);
+}
+.champSkeleton {
+  height: 116px;
+  border-radius: var(--r-lg);
+  border: 1px solid var(--border);
+}
+.tableSkeleton {
+  display: flex;
+  flex-direction: column;
+  border-radius: var(--r-lg);
+  border: 1px solid var(--border);
+  overflow: hidden;
+}
+.champSkeleton,
+.rowSkeleton {
+  background: linear-gradient(
+    100deg,
+    var(--surface-1) 30%,
+    var(--surface-2) 50%,
+    var(--surface-1) 70%
+  );
+  background-size: 200% 100%;
+  animation: lbShimmer 1.4s var(--ease-in-out) infinite;
+}
+.rowSkeleton {
+  height: 60px;
+  border-top: 1px solid var(--border);
+}
+.rowSkeleton:first-child {
+  border-top: none;
+}
+@keyframes lbShimmer {
+  from {
+    background-position: 200% 0;
+  }
+  to {
+    background-position: -200% 0;
+  }
+}
+
+/* ---- Responsive ----------------------------------------------------------- */
+
+/* Tablet / large phone: drop Top bias + Defiance (hideMd). Six cells remain —
+   #, Predictor, Shadow, You, Calls, Roasts — so the grid needs six tracks. */
+@media (max-width: 860px) {
+  .row {
+    grid-template-columns: 32px minmax(0, 1.6fr) repeat(4, 56px);
+  }
+  .hideMd {
+    display: none;
+  }
+}
+
+/* Phone: also drop Calls + Roasts (hideSm), leaving four cells. Champion cards
+   stack to one column. */
+@media (max-width: 600px) {
+  .champGrid,
+  .champGridSkeleton {
+    grid-template-columns: 1fr;
+  }
+  .row {
+    grid-template-columns: 28px minmax(0, 1fr) 56px 56px;
+    gap: var(--sp-2);
+    padding: var(--sp-3) var(--sp-4);
+  }
+  .hideSm {
+    display: none;
+  }
+}
+
+/* Narrow phone: tighten the numeric columns so the name keeps room. */
+@media (max-width: 380px) {
+  .row {
+    grid-template-columns: 24px minmax(0, 1fr) 48px 48px;
+    gap: var(--sp-1);
+    padding: var(--sp-3);
+  }
+  .title {
+    font-size: var(--step-3);
+  }
+}

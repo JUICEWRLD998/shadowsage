@@ -1,0 +1,60 @@
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  padding: var(--sp-1) var(--sp-2) var(--sp-1) var(--sp-3);
+  border-radius: var(--r-full);
+  border: 1px solid var(--border-you);
+  background: oklch(0.56 0.16 250 / 0.08);
+}
+
+.dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--you-300);
+  box-shadow: 0 0 8px var(--you-400);
+  flex-shrink: 0;
+}
+
+.meta {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.1;
+  min-width: 0;
+}
+.name {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 14ch;
+}
+.addr {
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  color: var(--text-faint);
+}
+
+.logout {
+  display: inline-grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  color: var(--text-faint);
+  transition: color var(--t-fast), background var(--t-fast);
+}
+.logout:hover {
+  color: var(--negative);
+  background: oklch(0.64 0.21 25 / 0.12);
+}
+
+/* The name is decorative on small screens — keep the address + disconnect. */
+@media (max-width: 560px) {
+  .name {
+    display: none;
+  }
+}

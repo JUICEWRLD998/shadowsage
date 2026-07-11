@@ -1,0 +1,144 @@
+.wrap {
+  flex-grow: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-4);
+  padding: var(--sp-10) var(--sp-5) var(--sp-20);
+  text-align: center;
+}
+
+.card {
+  position: relative;
+  max-width: 460px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sp-4);
+  padding: var(--sp-10) var(--sp-8);
+  border-radius: var(--r-xl, 20px);
+  border: 1px solid var(--border-shadow);
+  background: var(--surface-1);
+  overflow: hidden;
+}
+.card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.6;
+  background: radial-gradient(
+    90% 60% at 50% 0%,
+    oklch(0.5 0.2 295 / 0.18),
+    transparent 70%
+  );
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  font-family: var(--font-mono);
+  font-size: var(--step--1);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--shadow-300);
+}
+
+.title {
+  font-size: var(--step-3);
+  line-height: 1.15;
+  margin: 0;
+}
+
+.lede {
+  max-width: 38ch;
+  color: var(--text-muted);
+  line-height: 1.6;
+  margin: 0;
+}
+.lede em {
+  color: var(--text);
+  font-style: italic;
+}
+
+.actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sp-3);
+  margin-top: var(--sp-2);
+}
+
+.signBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  padding: var(--sp-3) var(--sp-6);
+  border-radius: var(--r-full);
+  font-weight: 600;
+  color: var(--text-inverse);
+  background: linear-gradient(135deg, var(--you-400), var(--shadow-500));
+  box-shadow:
+    0 4px 16px oklch(0.5 0.2 295 / 0.35),
+    inset 0 1px 0 oklch(1 0 0 / 0.25);
+  transition:
+    transform var(--t-fast) var(--ease-out-quart),
+    filter var(--t-fast);
+}
+.signBtn:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.08);
+}
+
+.signing {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  font-size: var(--step--1);
+  color: var(--shadow-300);
+}
+
+.spinner {
+  animation: gateSpin 0.9s linear infinite;
+}
+@keyframes gateSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.muted {
+  color: var(--text-muted);
+}
+
+.error {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  font-size: var(--step--1);
+  color: var(--negative);
+}
+
+.fine {
+  max-width: 40ch;
+  font-size: var(--step--1);
+  color: var(--text-faint);
+  line-height: 1.6;
+  margin: 0;
+}
+.walrus {
+  white-space: nowrap;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .spinner {
+    animation: none;
+  }
+  .signBtn:hover {
+    transform: none;
+  }
+}

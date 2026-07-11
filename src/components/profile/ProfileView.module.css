@@ -1,0 +1,151 @@
+.page {
+  padding-block: var(--sp-12) var(--sp-20);
+}
+
+.head {
+  margin-bottom: var(--sp-10);
+}
+.kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  margin-bottom: var(--sp-3);
+  font-family: var(--font-mono);
+  font-size: var(--step--1);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--shadow-300);
+}
+.title {
+  font-size: var(--step-4);
+  margin-bottom: var(--sp-3);
+}
+.lede {
+  max-width: 58ch;
+  color: var(--text-muted);
+  line-height: 1.6;
+}
+
+/* ---- Layout: helix + list ------------------------------------------------- */
+
+.layout {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: var(--sp-8);
+  align-items: start;
+}
+
+.helixCol {
+  position: sticky;
+  top: calc(var(--nav-h) + var(--sp-6));
+}
+.helixCard {
+  border-radius: var(--r-lg);
+  border: 1px solid var(--border-shadow);
+  background: radial-gradient(
+    120% 80% at 50% 0%,
+    oklch(0.5 0.2 295 / 0.12),
+    var(--surface-1) 70%
+  );
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-4);
+}
+
+/* ---- Skeletons ------------------------------------------------------------ */
+
+.helixSkeleton {
+  height: 360px;
+  border-radius: var(--r-lg);
+  border: 1px solid var(--border);
+  background: var(--surface-1);
+}
+.listSkeleton {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-4);
+}
+.cardSkeleton {
+  height: 150px;
+  border-radius: var(--r-md);
+  border: 1px solid var(--border);
+  background: linear-gradient(
+    100deg,
+    var(--surface-1) 30%,
+    var(--surface-2) 50%,
+    var(--surface-1) 70%
+  );
+  background-size: 200% 100%;
+  animation: profShimmer 1.4s var(--ease-in-out) infinite;
+}
+@keyframes profShimmer {
+  from {
+    background-position: 200% 0;
+  }
+  to {
+    background-position: -200% 0;
+  }
+}
+
+/* ---- Empty ---------------------------------------------------------------- */
+
+.empty {
+  max-width: 480px;
+  margin: var(--sp-16) auto;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.emptyIcon {
+  display: grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  margin-bottom: var(--sp-5);
+  border-radius: var(--r-lg);
+  color: var(--shadow-300);
+  background: oklch(0.5 0.2 295 / 0.12);
+  border: 1px solid var(--border-shadow);
+}
+.emptyTitle {
+  font-size: var(--step-2);
+  margin-bottom: var(--sp-2);
+}
+.emptyBody {
+  color: var(--text-muted);
+  line-height: 1.6;
+  margin-bottom: var(--sp-6);
+}
+.cta {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  padding: var(--sp-3) var(--sp-5);
+  border-radius: var(--r-full);
+  font-weight: 600;
+  color: var(--text-inverse);
+  background: linear-gradient(135deg, var(--you-400), var(--shadow-500));
+  box-shadow:
+    0 4px 16px oklch(0.5 0.2 295 / 0.35),
+    inset 0 1px 0 oklch(1 0 0 / 0.25);
+  transition: transform var(--t-fast) var(--ease-out-quart), filter var(--t-fast);
+}
+.cta:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.08);
+}
+
+@media (max-width: 860px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+  .helixCol {
+    position: static;
+    max-width: 320px;
+    margin-inline: auto;
+  }
+}

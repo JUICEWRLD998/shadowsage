@@ -1,0 +1,182 @@
+.row {
+  display: flex;
+  gap: var(--sp-3);
+  max-width: 100%;
+  animation: bubbleIn var(--t-base) var(--ease-out-expo) both;
+}
+
+@keyframes bubbleIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+/* User turns sit on the right with no avatar. */
+.user {
+  flex-direction: row-reverse;
+  margin-left: auto;
+}
+
+/* Grouped continuation — sits tight under the previous bubble of the same run.
+   The negative margin overrides the thread's gap so a run reads as one block. */
+.grouped {
+  margin-top: calc(var(--sp-5) * -1 + var(--sp-1));
+}
+
+/* ---- Avatar --------------------------------------------------------------- */
+
+.avatar {
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  margin-top: 22px; /* aligns with bubble, below the label */
+  border-radius: var(--r-full);
+  border: 1px solid var(--border);
+  background: var(--surface-2);
+  color: var(--text-muted);
+}
+/* Keeps grouped continuations aligned under the first bubble (no avatar). */
+.avatarSpacer {
+  flex-shrink: 0;
+  width: 30px;
+}
+.assistant .avatar {
+  color: var(--you-300);
+  border-color: var(--border-you);
+}
+.shadow .avatar {
+  color: var(--shadow-300);
+  border-color: var(--border-shadow);
+  box-shadow: var(--glow-shadow);
+}
+
+/* ---- Stack (label + bubble) ----------------------------------------------- */
+
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-1);
+  min-width: 0;
+  max-width: min(680px, 82%);
+}
+.user .stack {
+  align-items: flex-end;
+}
+
+.label {
+  font-size: var(--step--1);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--text-faint);
+  padding-inline: var(--sp-1);
+}
+.assistant .label {
+  color: var(--you-300);
+}
+.shadow .label {
+  color: var(--shadow-300);
+  font-family: var(--font-mono);
+}
+
+/* ---- Bubble --------------------------------------------------------------- */
+
+.bubble {
+  padding: var(--sp-3) var(--sp-4);
+  border-radius: var(--r-lg);
+}
+
+/* User: solid warm blue, tail toward the right. */
+.user .bubble {
+  background: linear-gradient(135deg, var(--you-600), var(--you-500));
+  border: 1px solid var(--border-you);
+  border-bottom-right-radius: var(--r-xs);
+  box-shadow: 0 4px 16px oklch(0.56 0.16 250 / 0.25);
+}
+.user .text {
+  color: oklch(0.98 0.01 250);
+}
+
+/* Assistant: neutral glass, tail toward the left. */
+.assistant .bubble {
+  border-bottom-left-radius: var(--r-xs);
+}
+
+/* Shadow: violet-tinted glass, mono voice. */
+.shadow .bubble {
+  background: oklch(0.5 0.2 295 / 0.14);
+  border: 1px solid var(--border-shadow);
+  border-bottom-left-radius: var(--r-xs);
+}
+.shadow .text {
+  font-family: var(--font-mono);
+  font-size: var(--step--1);
+  color: var(--shadow-300);
+}
+
+.text {
+  white-space: pre-wrap;
+  word-break: break-word;
+  line-height: 1.6;
+}
+
+/* Streaming caret — blinks at the tail of the assistant's text as it arrives. */
+.caret {
+  display: inline-block;
+  width: 2px;
+  height: 1.05em;
+  margin-left: 2px;
+  vertical-align: text-bottom;
+  border-radius: 1px;
+  background: var(--you-300);
+  animation: caretBlink 1s steps(2, start) infinite;
+}
+.shadow .caret {
+  background: var(--shadow-300);
+}
+@keyframes caretBlink {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+}
+
+/* ---- Thinking indicator --------------------------------------------------- */
+
+.thinking {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  height: 1.6em;
+}
+.thinking span {
+  width: 7px;
+  height: 7px;
+  border-radius: var(--r-full);
+  background: var(--text-faint);
+  animation: thinkingBounce 1.2s var(--ease-in-out) infinite;
+}
+.thinking span:nth-child(2) {
+  animation-delay: 0.15s;
+}
+.thinking span:nth-child(3) {
+  animation-delay: 0.3s;
+}
+
+@keyframes thinkingBounce {
+  0%,
+  60%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.5;
+  }
+  30% {
+    transform: translateY(-5px);
+    opacity: 1;
+  }
+}

@@ -1,0 +1,19 @@
+.flag {
+  display: inline-block;
+  flex-shrink: 0;
+  border-radius: 3px;
+  object-fit: cover;
+  /* A hairline ring keeps light flags (e.g. Japan) legible on dark surfaces. */
+  box-shadow:
+    inset 0 0 0 1px oklch(1 0 0 / 0.12),
+    0 1px 2px oklch(0 0 0 / 0.3);
+}
+
+.fallback {
+  display: inline-grid;
+  place-items: center;
+  flex-shrink: 0;
+  font-size: 0.9em;
+  line-height: 1;
+  opacity: 0.6;
+}

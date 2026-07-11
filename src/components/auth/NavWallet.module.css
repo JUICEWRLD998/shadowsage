@@ -1,0 +1,83 @@
+/* Shared pill sizing so connect / sign / signing all read as one control. */
+.connect,
+.signBtn,
+.signing {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  white-space: nowrap;
+}
+
+/* dapp-kit renders its own <button> inside .connect — restyle it to match the
+   app's gradient identity rather than the library default. */
+.connect button {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  padding: var(--sp-2) var(--sp-4);
+  border-radius: var(--r-full);
+  border: 0;
+  font-family: var(--font-sans);
+  font-size: var(--step--1);
+  font-weight: 600;
+  color: var(--text-inverse);
+  background: linear-gradient(135deg, var(--you-400), var(--shadow-500));
+  box-shadow:
+    0 4px 16px oklch(0.5 0.2 295 / 0.3),
+    inset 0 1px 0 oklch(1 0 0 / 0.25);
+  cursor: pointer;
+  transition:
+    transform var(--t-fast) var(--ease-out-quart),
+    filter var(--t-fast);
+}
+.connect button:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.08);
+}
+
+/* "Sign to enter" — same gradient language as the connect button. */
+.signBtn {
+  padding: var(--sp-2) var(--sp-4);
+  border-radius: var(--r-full);
+  font-size: var(--step--1);
+  font-weight: 600;
+  color: var(--text-inverse);
+  background: linear-gradient(135deg, var(--you-400), var(--shadow-500));
+  box-shadow:
+    0 4px 16px oklch(0.5 0.2 295 / 0.3),
+    inset 0 1px 0 oklch(1 0 0 / 0.25);
+  transition:
+    transform var(--t-fast) var(--ease-out-quart),
+    filter var(--t-fast);
+}
+.signBtn:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.08);
+}
+
+.signing {
+  padding: var(--sp-2) var(--sp-3);
+  border-radius: var(--r-full);
+  border: 1px solid var(--border-shadow, var(--border-strong));
+  background: var(--surface-2);
+  font-size: var(--step--1);
+  color: var(--shadow-300);
+}
+.spinner {
+  animation: navWalletSpin 0.9s linear infinite;
+}
+@keyframes navWalletSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .spinner {
+    animation: none;
+  }
+  .connect button:hover,
+  .signBtn:hover {
+    transform: none;
+  }
+}

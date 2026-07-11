@@ -1,0 +1,412 @@
+/* ============================================================================
+   LANDING PAGE
+   ========================================================================== */
+
+/* ───── HERO ───── */
+
+.hero {
+  position: relative;
+  padding-block: var(--sp-20) var(--sp-16);
+  overflow: hidden;
+}
+.hero::after {
+  /* fade the mesh into the page below */
+  content: "";
+  position: absolute;
+  inset: auto 0 0 0;
+  height: 160px;
+  background: linear-gradient(to bottom, transparent, var(--bg));
+  pointer-events: none;
+}
+
+.heroInner {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  padding: var(--sp-1) var(--sp-3);
+  border-radius: var(--r-full);
+  border: 1px solid var(--border-strong);
+  background: var(--glass);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  color: var(--text-muted);
+  font-size: var(--step--1);
+  font-weight: 500;
+  margin-bottom: var(--sp-6);
+}
+.badge svg {
+  color: var(--shadow-300);
+}
+
+.title {
+  font-size: var(--step-6);
+  letter-spacing: -0.03em;
+  margin-bottom: var(--sp-5);
+  animation: rise var(--t-slow) var(--ease-out-expo) both;
+}
+
+.lede {
+  max-width: 60ch;
+  color: var(--text-muted);
+  font-size: var(--step-1);
+  line-height: 1.6;
+  margin-bottom: var(--sp-8);
+  animation: rise var(--t-slow) var(--ease-out-expo) 80ms both;
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+}
+
+.ctas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-3);
+  justify-content: center;
+  margin-bottom: var(--sp-16);
+  animation: rise var(--t-slow) var(--ease-out-expo) 160ms both;
+}
+
+.ctaPrimary {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  padding: var(--sp-3) var(--sp-6);
+  border-radius: var(--r-full);
+  font-weight: 600;
+  color: var(--text-inverse);
+  background: linear-gradient(135deg, var(--you-400), var(--shadow-500));
+  box-shadow:
+    0 4px 16px oklch(0.5 0.2 295 / 0.35),
+    inset 0 1px 0 oklch(1 0 0 / 0.25);
+  transition:
+    transform var(--t-fast) var(--ease-out-quart),
+    filter var(--t-fast);
+}
+.ctaPrimary:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.08);
+}
+.ctaPrimary:active {
+  transform: translateY(0) scale(0.98);
+}
+
+.ctaSecondary {
+  display: inline-flex;
+  align-items: center;
+  padding: var(--sp-3) var(--sp-6);
+  border-radius: var(--r-full);
+  font-weight: 600;
+  color: var(--text);
+  border: 1px solid var(--border-strong);
+  background: var(--glass);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  transition:
+    border-color var(--t-fast),
+    background var(--t-fast),
+    transform var(--t-fast) var(--ease-out-quart);
+}
+.ctaSecondary:hover {
+  border-color: var(--border-you);
+  transform: translateY(-2px);
+}
+
+/* You vs Shadow duel cards */
+.duel {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: var(--sp-4);
+  width: 100%;
+  max-width: 920px;
+  text-align: left;
+  animation: rise var(--t-slow) var(--ease-out-expo) 240ms both;
+}
+
+.duelCard {
+  padding: var(--sp-5);
+  border-radius: var(--r-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+  min-height: 100%;
+}
+.duelYou {
+  border-color: var(--border-you);
+  box-shadow:
+    0 8px 32px oklch(0 0 0 / 0.45),
+    inset 0 1px 0 oklch(1 0 0 / 0.1),
+    0 0 0 1px var(--you-glow);
+}
+.duelShadow {
+  border-color: var(--border-shadow);
+  box-shadow:
+    0 8px 32px oklch(0 0 0 / 0.45),
+    inset 0 1px 0 oklch(1 0 0 / 0.1),
+    0 0 0 1px var(--shadow-glow);
+}
+
+.duelLabel {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  font-size: var(--step--1);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+.duelYou .duelLabel {
+  color: var(--you-300);
+}
+.duelShadow .duelLabel {
+  color: var(--shadow-300);
+}
+
+.duelQuote {
+  font-size: var(--step-0);
+  line-height: 1.5;
+  color: var(--text);
+}
+.duelShadow .duelQuote {
+  font-family: var(--font-mono);
+  font-size: var(--step--1);
+  color: var(--shadow-300);
+}
+
+.duelMeta {
+  margin-top: auto;
+  font-family: var(--font-mono);
+  font-size: var(--step--1);
+  color: var(--text-faint);
+}
+
+.duelVs {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--r-full);
+  color: var(--gold);
+  background: var(--surface-2);
+  border: 1px solid var(--border-strong);
+  box-shadow: var(--shadow-md);
+}
+/* The flame breathes everywhere; the badge floats only on the desktop
+   (horizontal) layout, where its transform isn't used for the 90° rotation. */
+.duelVs svg {
+  animation: flameFlicker 2.4s var(--ease-in-out) infinite;
+}
+@keyframes flameFlicker {
+  0%,
+  100% {
+    opacity: 1;
+    filter: drop-shadow(0 0 4px oklch(0.82 0.15 85 / 0.55));
+  }
+  50% {
+    opacity: 0.82;
+    filter: drop-shadow(0 0 9px oklch(0.82 0.15 85 / 0.9));
+  }
+}
+@media (min-width: 861px) {
+  .duelVs {
+    animation: vsFloat 4s var(--ease-in-out) infinite;
+  }
+  @keyframes vsFloat {
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-5px);
+    }
+  }
+}
+
+/* ───── EMERGENCE TEASER ───── */
+
+.emergence {
+  padding-block: var(--sp-20);
+  text-align: center;
+  border-block: 1px solid var(--border);
+  background:
+    radial-gradient(60% 100% at 50% 50%, oklch(0.42 0.18 295 / 0.12), transparent 70%),
+    var(--bg);
+}
+.emergenceKicker {
+  font-family: var(--font-mono);
+  font-size: var(--step--1);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--shadow-300);
+  margin-bottom: var(--sp-5);
+}
+.emergenceLine {
+  font-size: var(--step-3);
+  max-width: 24ch;
+  margin-inline: auto;
+  color: var(--text-muted);
+  line-height: 1.25;
+}
+.emergenceAccent {
+  color: var(--text);
+}
+
+/* ───── SHARED SECTION HEADER ───── */
+
+.sectionHead {
+  text-align: center;
+  margin-bottom: var(--sp-12);
+}
+.sectionHead h2 {
+  margin-bottom: var(--sp-2);
+}
+
+/* ───── FEATURES ───── */
+
+.features {
+  padding-block: var(--sp-24);
+}
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--sp-6);
+  max-width: 1080px;
+  margin-inline: auto;
+}
+.card {
+  position: relative;
+  padding: var(--sp-8);
+  border-radius: var(--r-xl);
+  transition:
+    transform var(--t-base) var(--ease-out-quart),
+    border-color var(--t-base);
+}
+.card:hover {
+  border-color: var(--border-strong);
+}
+.cardIcon {
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  border-radius: var(--r-md);
+  margin-bottom: var(--sp-4);
+  color: var(--you-300);
+  background: oklch(0.56 0.16 250 / 0.12);
+  border: 1px solid var(--border-you);
+}
+.card:nth-child(even) .cardIcon {
+  color: var(--shadow-300);
+  background: oklch(0.5 0.2 295 / 0.12);
+  border-color: var(--border-shadow);
+}
+.cardTitle {
+  font-size: var(--step-1);
+  margin-bottom: var(--sp-2);
+}
+.cardBody {
+  color: var(--text-muted);
+  line-height: 1.6;
+}
+
+/* ───── HOW IT WORKS ───── */
+
+.how {
+  padding-block: var(--sp-20);
+  background: var(--surface-1);
+  border-block: 1px solid var(--border);
+}
+.steps {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--sp-6);
+}
+.step {
+  position: relative;
+  padding: var(--sp-6);
+  border-radius: var(--r-lg);
+  border: 1px solid var(--border);
+  background: var(--bg);
+}
+.stepNum {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: var(--step-3);
+  font-weight: 700;
+  background: linear-gradient(135deg, var(--you-400), var(--shadow-400));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: var(--sp-3);
+}
+.stepTitle {
+  font-size: var(--step-1);
+  margin-bottom: var(--sp-2);
+}
+.stepBody {
+  color: var(--text-muted);
+  line-height: 1.6;
+}
+
+/* ───── CLOSING CTA ───── */
+
+.closing {
+  padding-block: var(--sp-24);
+  text-align: center;
+  background:
+    radial-gradient(50% 80% at 50% 0%, oklch(0.45 0.14 250 / 0.14), transparent 70%),
+    var(--bg);
+}
+.closingInner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sp-6);
+}
+.closingTitle {
+  font-size: var(--step-4);
+}
+.poweredBy {
+  font-size: var(--step--1);
+  color: var(--text-faint);
+}
+
+/* ───── RESPONSIVE ───── */
+
+@media (max-width: 860px) {
+  .duel {
+    grid-template-columns: 1fr;
+  }
+  .duelVs {
+    justify-self: center;
+  }
+  .grid {
+    grid-template-columns: 1fr;
+  }
+  .steps {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 560px) {
+  .hero {
+    padding-block: var(--sp-12) var(--sp-10);
+  }
+  .emergence,
+  .features,
+  .how {
+    padding-block: var(--sp-12);
+  }
+}

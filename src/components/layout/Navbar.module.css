@@ -1,0 +1,153 @@
+.nav {
+  position: fixed;
+  inset: 0 0 auto 0;
+  z-index: var(--z-nav);
+  height: var(--nav-h);
+  background: oklch(0.13 0.015 270 / 0.6);
+  backdrop-filter: blur(16px) saturate(160%);
+  -webkit-backdrop-filter: blur(16px) saturate(160%);
+  border-bottom: 1px solid var(--border);
+}
+
+.inner {
+  height: 100%;
+  max-width: var(--container-wide);
+  margin-inline: auto;
+  padding-inline: var(--sp-5);
+  display: flex;
+  align-items: center;
+  gap: var(--sp-6);
+}
+
+/* ---- Brand ---------------------------------------------------------------- */
+
+/* Brand + right cluster flex equally so the centered links stay truly centered. */
+.brand {
+  flex: 1 1 0;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  min-width: 0;
+}
+
+.brandLogo {
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+.brandText {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.1rem;
+  letter-spacing: -0.02em;
+  color: var(--text);
+}
+.brandTextAccent {
+  color: var(--shadow-300);
+}
+
+/* ---- Desktop links (centered) --------------------------------------------- */
+
+.links {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-1);
+}
+
+.link {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  padding: var(--sp-2) var(--sp-3);
+  border-radius: var(--r-sm);
+  font-size: var(--step--1);
+  font-weight: 500;
+  color: var(--text-muted);
+  transition:
+    color var(--t-fast) var(--ease-out-quart),
+    background var(--t-fast) var(--ease-out-quart);
+}
+.link:hover {
+  color: var(--text);
+  background: oklch(1 0 0 / 0.04);
+}
+.linkActive {
+  color: var(--text);
+  background: oklch(1 0 0 / 0.06);
+}
+
+/* Sliding active indicator (shared layoutId animates it between links). */
+.indicator {
+  position: absolute;
+  left: var(--sp-3);
+  right: var(--sp-3);
+  bottom: 2px;
+  height: 2px;
+  border-radius: var(--r-full);
+  background: linear-gradient(90deg, var(--you-400), var(--shadow-400));
+  box-shadow: 0 0 8px oklch(0.66 0.2 295 / 0.5);
+}
+
+/* ---- Right cluster (wallet control + mobile button) ----------------------- */
+
+.right {
+  flex: 1 1 0;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--sp-3);
+  min-width: 0;
+}
+
+/* ---- Mobile --------------------------------------------------------------- */
+
+.menuBtn {
+  display: none;
+  padding: var(--sp-2);
+  border-radius: var(--r-sm);
+  color: var(--text-muted);
+}
+.menuBtn:hover {
+  color: var(--text);
+  background: oklch(1 0 0 / 0.05);
+}
+
+.mobileMenu {
+  display: none;
+  flex-direction: column;
+  gap: var(--sp-1);
+  padding: var(--sp-3);
+  background: oklch(0.15 0.016 270 / 0.96);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--border);
+}
+.mobileMenu.mobileOpen {
+  display: flex;
+}
+.mobileLink {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  padding: var(--sp-3) var(--sp-4);
+  border-radius: var(--r-sm);
+  color: var(--text-muted);
+  font-weight: 500;
+}
+.mobileLink:hover {
+  color: var(--text);
+  background: oklch(1 0 0 / 0.05);
+}
+
+@media (max-width: 768px) {
+  .links {
+    display: none;
+  }
+  .menuBtn {
+    display: inline-flex;
+  }
+}

@@ -1,0 +1,81 @@
+.card {
+  padding: var(--sp-3) var(--sp-4);
+  border-radius: var(--r-md);
+  border: 1px solid var(--border);
+  border-left: 2px solid var(--you);
+  background: var(--surface-1);
+  transition:
+    border-color var(--t-fast),
+    background var(--t-fast);
+}
+.card:hover {
+  background: var(--surface-2);
+}
+
+.head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--sp-2);
+}
+.match {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-1);
+  min-width: 0;
+  font-size: var(--step--1);
+  font-weight: 600;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.flag {
+  font-size: 1.05em;
+  line-height: 1;
+}
+.vs {
+  margin-inline: var(--sp-1);
+  font-size: 0.72rem;
+  font-weight: 500;
+  color: var(--text-faint);
+}
+.conf {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--you-300);
+  flex-shrink: 0;
+}
+
+.pickRow {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  margin-top: var(--sp-1);
+}
+.pick {
+  font-size: var(--step--1);
+  font-weight: 500;
+  color: var(--text-muted);
+}
+.score {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text);
+  padding: 1px var(--sp-2);
+  border-radius: var(--r-xs);
+  background: var(--surface-3);
+}
+
+.reason {
+  margin-top: var(--sp-2);
+  font-size: 0.8rem;
+  line-height: 1.4;
+  color: var(--text-faint);
+  font-style: italic;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}

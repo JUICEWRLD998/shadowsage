@@ -1,0 +1,71 @@
+.wrap {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sp-4);
+  padding: var(--sp-6);
+}
+
+.svg {
+  width: 100%;
+  max-width: 240px;
+  height: auto;
+  overflow: visible;
+  filter: drop-shadow(0 0 14px oklch(0.58 0.21 295 / 0.25));
+  animation: dnaSway 9s var(--ease-in-out) infinite;
+  transform-origin: center;
+}
+
+@keyframes dnaSway {
+  0%,
+  100% {
+    transform: rotate(-1.2deg);
+  }
+  50% {
+    transform: rotate(1.2deg);
+  }
+}
+
+.backbone {
+  fill: none;
+  stroke: var(--shadow-400);
+  stroke-width: 2.5;
+  stroke-opacity: 0.55;
+  stroke-linecap: round;
+  stroke-dasharray: 1400;
+  stroke-dashoffset: 1400;
+  animation: dnaDraw 1.6s var(--ease-out-quart) forwards;
+}
+
+@keyframes dnaDraw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+.rung {
+  opacity: 0;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: dnaRung 0.5s var(--ease-out-quart) forwards;
+}
+
+@keyframes dnaRung {
+  from {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.caption {
+  font-family: var(--font-mono);
+  font-size: var(--step--1);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}

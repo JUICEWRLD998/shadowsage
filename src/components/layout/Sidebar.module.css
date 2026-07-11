@@ -1,0 +1,191 @@
+/* ── Desktop rail (default, >1024px) ─────────────────────────────────────── */
+
+.sidebar {
+  width: 380px;
+  flex-shrink: 0;
+  height: 100%;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  border-left: 1px solid var(--border);
+  padding: var(--sp-6) var(--sp-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-8);
+  background: linear-gradient(
+    to bottom,
+    oklch(0.17 0.018 270 / 0.4),
+    transparent 240px
+  );
+}
+
+.block {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+}
+
+.blockHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-2);
+  padding-bottom: var(--sp-1);
+}
+.title {
+  font-family: var(--font-display);
+  font-size: var(--step--1);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+.count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 22px;
+  height: 22px;
+  padding-inline: var(--sp-2);
+  border-radius: var(--r-full);
+  background: oklch(0.56 0.16 250 / 0.16);
+  border: 1px solid var(--border-you);
+  color: var(--you-300);
+  font-size: 0.72rem;
+  font-weight: 600;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+}
+
+.empty {
+  font-size: var(--step--1);
+  line-height: 1.5;
+  color: var(--text-faint);
+  padding: var(--sp-2) 0;
+}
+
+.skeleton {
+  height: 58px;
+  border-radius: var(--r-md);
+  border: 1px solid var(--border);
+  background: linear-gradient(
+    100deg,
+    var(--surface-1) 30%,
+    var(--surface-2) 50%,
+    var(--surface-1) 70%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.4s var(--ease-in-out) infinite;
+}
+@keyframes shimmer {
+  from {
+    background-position: 200% 0;
+  }
+  to {
+    background-position: -200% 0;
+  }
+}
+
+/* These controls only exist on mobile; hidden on desktop. */
+.fab,
+.backdrop,
+.close {
+  display: none;
+}
+
+/* ── Mobile drawer (≤1024px) ─────────────────────────────────────────────── */
+
+@media (max-width: 1024px) {
+  /* Floating opener, pinned just under the navbar. */
+  .fab {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--sp-2);
+    position: fixed;
+    top: calc(var(--nav-h) + var(--sp-3));
+    right: var(--sp-4);
+    z-index: var(--z-sticky);
+    padding: var(--sp-2) var(--sp-4);
+    border-radius: var(--r-full);
+    border: 1px solid var(--border-you);
+    background: var(--surface-2);
+    color: var(--you-300);
+    font-size: var(--step--1);
+    font-weight: 600;
+    box-shadow: var(--shadow-md);
+  }
+  .fab:active {
+    transform: scale(0.97);
+  }
+
+  /* Dim + blur the chat behind the open drawer. */
+  .backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: calc(var(--z-modal) - 1);
+    background: oklch(0 0 0 / 0.5);
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
+    animation: fade var(--t-fast) var(--ease-out-quart);
+  }
+  @keyframes fade {
+    from {
+      opacity: 0;
+    }
+  }
+
+  /* The rail becomes an off-canvas drawer sliding from the right. */
+  .sidebar {
+    position: fixed;
+    top: var(--nav-h);
+    right: 0;
+    bottom: 0;
+    width: min(360px, 88vw);
+    z-index: var(--z-modal);
+    border-left: 1px solid var(--border);
+    background: var(--surface-1);
+    box-shadow: var(--shadow-xl);
+    padding-top: var(--sp-10);
+    transform: translateX(100%);
+    visibility: hidden;
+    transition:
+      transform var(--t-base) var(--ease-out-expo),
+      visibility 0s linear var(--t-base);
+  }
+  .sidebar[data-open="true"] {
+    transform: translateX(0);
+    visibility: visible;
+    transition:
+      transform var(--t-base) var(--ease-out-expo),
+      visibility 0s;
+  }
+
+  /* Close (×) inside the drawer. */
+  .close {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    top: var(--sp-3);
+    right: var(--sp-3);
+    width: 34px;
+    height: 34px;
+    border-radius: var(--r-full);
+    border: 1px solid var(--border);
+    background: var(--surface-2);
+    color: var(--text-muted);
+  }
+  .close:active {
+    transform: scale(0.95);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sidebar {
+    transition: none;
+  }
+}

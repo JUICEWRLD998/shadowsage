@@ -1,0 +1,222 @@
+.window {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  position: relative;
+}
+
+/* Faint living ambience behind the thread — a slow violet/blue breath. */
+.window::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(50% 40% at 50% 0%, oklch(0.5 0.2 295 / 0.06), transparent 70%),
+    radial-gradient(45% 35% at 50% 100%, oklch(0.56 0.16 250 / 0.05), transparent 70%);
+  animation: ambientBreath 9s var(--ease-in-out) infinite;
+}
+@keyframes ambientBreath {
+  0%,
+  100% {
+    opacity: 0.7;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+/* ---- Scrolling transcript ------------------------------------------------- */
+
+.scroll {
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.thread {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-5);
+  width: 100%;
+  max-width: 860px;
+  margin-inline: auto;
+  padding: var(--sp-6) var(--sp-5) var(--sp-8);
+  min-height: 100%;
+}
+
+/* Session divider — a centered hairline label ("Today"). */
+.divider {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  margin-bottom: var(--sp-1);
+  color: var(--text-faint);
+}
+.divider::before,
+.divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(
+    to var(--_dir, right),
+    transparent,
+    var(--border)
+  );
+}
+.divider::after {
+  --_dir: left;
+}
+.divider span {
+  flex-shrink: 0;
+  font-size: var(--step--1);
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.error {
+  align-self: center;
+  padding: var(--sp-2) var(--sp-4);
+  border-radius: var(--r-md);
+  border: 1px solid var(--border-shadow);
+  background: oklch(0.64 0.21 25 / 0.12);
+  color: var(--negative);
+  font-size: var(--step--1);
+}
+
+/* ---- Composer (sticky footer) --------------------------------------------- */
+
+.composer {
+  position: relative;
+  z-index: 1;
+  flex-shrink: 0;
+  border-top: 1px solid var(--border);
+  background: linear-gradient(to top, var(--bg) 60%, transparent);
+  padding-bottom: var(--sp-4);
+}
+.composerInner {
+  width: 100%;
+  max-width: 860px;
+  margin-inline: auto;
+  padding: var(--sp-4) var(--sp-5) 0;
+}
+
+/* ---- Empty state ---------------------------------------------------------- */
+
+.empty {
+  margin: auto;
+  text-align: center;
+  max-width: 620px;
+  padding-block: var(--sp-10);
+  animation: emptyIn var(--t-slow) var(--ease-out-expo) both;
+}
+
+@keyframes emptyIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+}
+
+.emptyBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  padding: var(--sp-1) var(--sp-3);
+  margin-bottom: var(--sp-5);
+  border-radius: var(--r-full);
+  border: 1px solid var(--border-you);
+  background: oklch(0.56 0.16 250 / 0.1);
+  color: var(--you-300);
+  font-size: var(--step--1);
+  font-weight: 500;
+}
+.emptyDot {
+  width: 7px;
+  height: 7px;
+  border-radius: var(--r-full);
+  background: var(--you-400);
+  animation: pillPulse 1.8s var(--ease-in-out) infinite;
+}
+@keyframes pillPulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 oklch(0.72 0.15 250 / 0.5);
+  }
+  50% {
+    box-shadow: 0 0 0 5px oklch(0.72 0.15 250 / 0);
+  }
+}
+
+.emptyTitle {
+  font-size: var(--step-3);
+  margin-bottom: var(--sp-3);
+}
+
+.emptyLede {
+  color: var(--text-muted);
+  margin-bottom: var(--sp-6);
+  text-wrap: pretty;
+}
+
+.suggestions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--sp-3);
+}
+
+.suggestion {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-3);
+  padding: var(--sp-3) var(--sp-4);
+  border-radius: var(--r-md);
+  border: 1px solid var(--border);
+  background: var(--surface-1);
+  color: var(--text-muted);
+  font-size: var(--step--1);
+  text-align: left;
+  line-height: 1.4;
+  transition:
+    border-color var(--t-fast),
+    color var(--t-fast),
+    background var(--t-fast),
+    transform var(--t-fast) var(--ease-out-quart);
+}
+.suggestion:hover:not(:disabled) {
+  color: var(--text);
+  border-color: var(--border-you);
+  background: var(--surface-2);
+  transform: translateY(-2px);
+}
+.suggestion:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.suggestionIcon {
+  flex-shrink: 0;
+  color: var(--text-faint);
+  transition:
+    color var(--t-fast),
+    transform var(--t-fast) var(--ease-out-quart);
+}
+.suggestion:hover:not(:disabled) .suggestionIcon {
+  color: var(--you-300);
+  transform: translate(2px, -2px);
+}
+
+@media (max-width: 560px) {
+  .suggestions {
+    grid-template-columns: 1fr;
+  }
+  .emptyTitle {
+    font-size: var(--step-2);
+  }
+}

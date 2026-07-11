@@ -1,0 +1,105 @@
+.card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+  padding: var(--sp-5);
+  border-radius: var(--r-md);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--dna, var(--n-700));
+  background: var(--surface-1);
+}
+
+.head {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+}
+.dot {
+  flex-shrink: 0;
+  width: 12px;
+  height: 12px;
+  border-radius: var(--r-full);
+  background: var(--dna, var(--n-700));
+  box-shadow: 0 0 12px var(--dna, transparent);
+}
+.titleWrap {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--sp-3);
+  flex: 1;
+  min-width: 0;
+}
+.name {
+  font-size: var(--step-1);
+  font-weight: 700;
+}
+.tier {
+  flex-shrink: 0;
+  font-family: var(--font-mono);
+  font-size: var(--step--1);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-faint);
+}
+
+.meter {
+  position: relative;
+  height: 6px;
+  border-radius: var(--r-full);
+  background: oklch(1 0 0 / 0.06);
+  overflow: hidden;
+}
+.meterFill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  border-radius: inherit;
+  background: var(--dna, var(--n-400));
+  box-shadow: 0 0 10px var(--dna, transparent);
+}
+
+.desc {
+  font-size: var(--step--1);
+  color: var(--text-muted);
+  line-height: 1.55;
+}
+
+.evidence {
+  margin-top: var(--sp-1);
+  padding-top: var(--sp-3);
+  border-top: 1px solid var(--border);
+}
+.evidenceLabel {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: var(--sp-2);
+  font-size: var(--step--1);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-faint);
+}
+.evidence ul {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-1);
+}
+.evidence li {
+  position: relative;
+  padding-left: var(--sp-4);
+  font-size: var(--step--1);
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+.evidence li::before {
+  content: "";
+  position: absolute;
+  left: 4px;
+  top: 0.6em;
+  width: 4px;
+  height: 4px;
+  border-radius: var(--r-full);
+  background: var(--dna, var(--n-400));
+}

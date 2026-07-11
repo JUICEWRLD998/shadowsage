@@ -1,0 +1,84 @@
+/* GlitchText — RGB-split glitch. The two pseudo copies use the SHADOW violet
+   and a cold cyan so the effect reads as the "cold twin" breaking through. */
+
+.glitch {
+  position: relative;
+  display: inline-block;
+  color: inherit;
+}
+
+.glitch::before,
+.glitch::after {
+  content: attr(data-text);
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.85;
+  clip-path: inset(0 0 0 0);
+}
+
+/* Cold cyan copy, nudged left. */
+.glitch::before {
+  color: oklch(0.78 0.13 210);
+  z-index: -1;
+}
+
+/* Shadow violet copy, nudged right. */
+.glitch::after {
+  color: var(--shadow-400);
+  z-index: -2;
+}
+
+/* Only animate when active (and motion is allowed). */
+.active::before {
+  animation: glitchBefore 2.6s steps(2, end) infinite;
+}
+.active::after {
+  animation: glitchAfter 3.1s steps(2, end) infinite;
+}
+
+@keyframes glitchBefore {
+  0%, 92%, 100% {
+    transform: translate(0, 0);
+    clip-path: inset(0 0 0 0);
+  }
+  93% {
+    transform: translate(-2px, -1px);
+    clip-path: inset(0 0 64% 0);
+  }
+  96% {
+    transform: translate(-3px, 1px);
+    clip-path: inset(72% 0 0 0);
+  }
+  98% {
+    transform: translate(-1px, 0);
+    clip-path: inset(34% 0 40% 0);
+  }
+}
+
+@keyframes glitchAfter {
+  0%, 90%, 100% {
+    transform: translate(0, 0);
+    clip-path: inset(0 0 0 0);
+  }
+  91% {
+    transform: translate(2px, 1px);
+    clip-path: inset(0 0 70% 0);
+  }
+  94% {
+    transform: translate(3px, -1px);
+    clip-path: inset(60% 0 0 0);
+  }
+  97% {
+    transform: translate(1px, 0);
+    clip-path: inset(30% 0 45% 0);
+  }
+}
+
+/* Respect reduced motion — drop the colour copies and all jitter. */
+@media (prefers-reduced-motion: reduce) {
+  .glitch::before,
+  .glitch::after {
+    display: none;
+  }
+}

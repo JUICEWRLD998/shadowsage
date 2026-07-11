@@ -1,0 +1,106 @@
+/* ScreenGlitch — full-viewport tear overlay. Sits above modals, never blocks
+   input. Total play time ~700ms; the component unmounts when `active` is false. */
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: calc(var(--z-modal) + 10);
+  pointer-events: none;
+  overflow: hidden;
+  animation: flash 700ms var(--ease-out-quart) both;
+}
+
+@keyframes flash {
+  0% {
+    background: oklch(0.66 0.2 295 / 0);
+  }
+  12% {
+    background: oklch(0.66 0.2 295 / 0.22);
+  }
+  100% {
+    background: oklch(0.66 0.2 295 / 0);
+  }
+}
+
+/* Moving scanlines. */
+.scan {
+  position: absolute;
+  inset: -10% 0;
+  background: repeating-linear-gradient(
+    to bottom,
+    oklch(1 0 0 / 0.05) 0,
+    oklch(1 0 0 / 0.05) 1px,
+    transparent 2px,
+    transparent 4px
+  );
+  mix-blend-mode: overlay;
+  animation: scanMove 700ms linear both;
+}
+@keyframes scanMove {
+  from {
+    transform: translateY(-8%);
+    opacity: 0.8;
+  }
+  to {
+    transform: translateY(8%);
+    opacity: 0;
+  }
+}
+
+/* Two RGB tear bands that slam across and fade. */
+.tearA,
+.tearB {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 14%;
+  mix-blend-mode: screen;
+  opacity: 0;
+}
+.tearA {
+  top: 28%;
+  background: linear-gradient(90deg, transparent, oklch(0.78 0.13 210 / 0.5), transparent);
+  animation: tear 620ms steps(3, end) both;
+}
+.tearB {
+  top: 58%;
+  background: linear-gradient(90deg, transparent, oklch(0.66 0.2 295 / 0.55), transparent);
+  animation: tear 680ms steps(3, end) 60ms both;
+}
+@keyframes tear {
+  0% {
+    transform: translateX(-30%);
+    opacity: 0;
+  }
+  20% {
+    opacity: 1;
+  }
+  60% {
+    transform: translateX(30%);
+    opacity: 0.8;
+  }
+  100% {
+    transform: translateX(0);
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .overlay {
+    animation: softFlash 400ms ease both;
+  }
+  .scan,
+  .tearA,
+  .tearB {
+    display: none;
+  }
+  @keyframes softFlash {
+    0%,
+    100% {
+      background: oklch(0.66 0.2 295 / 0);
+    }
+    50% {
+      background: oklch(0.66 0.2 295 / 0.15);
+    }
+  }
+}
