@@ -79,3 +79,49 @@
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
+
+/* Stake section */
+.stakeSection {
+  margin-top: var(--sp-3);
+  padding-top: var(--sp-3);
+  border-top: 1px solid var(--border-subtle);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-2);
+}
+
+.stakeBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-1-5);
+  padding: var(--sp-1-5) var(--sp-2-5);
+  border-radius: var(--r-full);
+  background: oklch(0.18 0.02 295 / 0.5);
+  border: 1px solid var(--stake-color, var(--border-you));
+  font-size: 0.72rem;
+  color: var(--stake-color, var(--text));
+}
+
+.stakeAmount {
+  font-family: var(--font-mono);
+  font-weight: 600;
+}
+
+.stakeStatus {
+  font-weight: 500;
+  opacity: 0.8;
+}
+
+.stakePayout {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: oklch(0.7 0.16 145);
+}
+
+.stakeLost {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--negative);
+}

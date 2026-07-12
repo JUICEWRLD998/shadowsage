@@ -245,3 +245,39 @@
     white-space: normal;
   }
 }
+
+/* ---- Stake outcome -------------------------------------------------------- */
+
+.stakeOutcome {
+  margin-top: var(--sp-3);
+  padding-top: var(--sp-3);
+  border-top: 1px solid var(--border-subtle);
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  font-size: var(--step--1);
+  color: var(--text-muted);
+}
+
+.stakeLabel {
+  font-weight: 500;
+}
+
+.stakeAmount {
+  font-family: var(--font-mono);
+  font-weight: 600;
+  color: var(--text);
+}
+
+.stakeWon {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  color: oklch(0.7 0.16 145);
+  margin-left: auto;
+}
+
+.stakeLost {
+  font-weight: 600;
+  color: var(--negative);
+  margin-left: auto;
+}

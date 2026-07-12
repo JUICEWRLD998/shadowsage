@@ -4,19 +4,40 @@
  * CallsView — the full prediction-history surface for /calls.
  *
  * Pulls every stored pick back from wallet-scoped memory (newest first) and lays them
- * out as a responsive grid of PredictionCards. This is the home for the user's
- * track record, moved out of the chat sidebar so the conversation stays focused.
+ * out as a responsive grid of PredictionCards. Now includes stake information for
+ * predictions that have been backed with USDt.
  */
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { ArrowRight, History } from "lucide-react";
 import { useRecentPredictions } from "@/hooks/usePredictions";
 import { PredictionCard } from "@/components/chat/PredictionCard";
 import { Stagger, StaggerItem } from "@/components/ui/Reveal";
+import type { Stake } from "@/types";
 import styles from "./CallsView.module.css";
 
 export function CallsView() {
   const { predictions, loading } = useRecentPredictions(50);
+  const [stakes, setStakes] = useState<Stake[]>([]);
+  const [stakesLoading, setStakesLoading] = useState(false);
+
+  // Fetch stakes for all predictions
+  useEffect(() => {
+    if (predictions.length === 0) return;
+
+    setStakesLoading(true);
+    fetch("/api/stakes")
+      .then((res) => res.json())
+      .then((data) => setStakes(data.stakes || []))
+      .catch((err) => console.error("[CallsView] Failed to fetch stakes:", err))
+      .finally(() => setStakesLoading(false));
+  }, [predictions]);
+
+  // Helper to find stake for a prediction
+  const getStakeForPrediction = (predictionId: string): Stake | undefined => {
+    return stakes.find((stake) => stake.predictionId === predictionId);
+  };
 
   return (
     <main className={styles.page}>
@@ -59,6 +80,7 @@ export function CallsView() {
                   predictedScore={p.predictedScore}
                   confidence={p.confidence}
                   reasoning={p.reasoning}
+                  stake={getStakeForPrediction(p.id || "")}
                 />
               </StaggerItem>
             ))}

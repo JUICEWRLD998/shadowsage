@@ -7,17 +7,25 @@
  * against real World Cup results — settled calls (correct / wrong, with the
  * final scoreline) and still-pending calls awaiting kickoff. This is where the
  * user's track record stops being a list and becomes a contest.
+ *
+ * Now includes stake outcomes for predictions backed with USDt.
  */
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
-import { ArrowRight, Check, Swords, X, Clock, Zap } from "lucide-react";
+import { ArrowRight, Check, Swords, X, Clock, Zap, Coins } from "lucide-react";
 import { useArena, type ResolvedPrediction } from "@/hooks/useArena";
 import { AccuracyBoard } from "./AccuracyBoard";
 import { Stagger, StaggerItem } from "@/components/ui/Reveal";
+import type { Stake } from "@/types";
+import { formatStakeAmount } from "@/lib/stakes";
 import styles from "./PredictionArena.module.css";
 
-function VerdictRow({ p }: { p: ResolvedPrediction }) {
+function VerdictRow({ p, stake }: { p: ResolvedPrediction; stake?: Stake }) {
   const settled = p.verdict !== "pending";
+  const hasStake = !!stake;
+  const stakeResolved = stake?.status === "won" || stake?.status === "lost";
+
   return (
     <article
       className={`${styles.row} ${styles[p.verdict]}`}
@@ -53,6 +61,30 @@ function VerdictRow({ p }: { p: ResolvedPrediction }) {
           </span>
         )}
       </div>
+
+      {/* Stake outcome */}
+      {hasStake && (
+        <div className={styles.stakeOutcome}>
+          <Coins size={14} aria-hidden />
+          <span className={styles.stakeLabel}>Stake:</span>
+          <span className={styles.stakeAmount}>
+            {formatStakeAmount(stake.amount, stake.asset)}
+          </span>
+          {stakeResolved && (
+            <span
+              className={
+                stake.status === "won"
+                  ? styles.stakeWon
+                  : styles.stakeLost
+              }
+            >
+              {stake.status === "won" && stake.payout
+                ? `Won ${formatStakeAmount(stake.payout, stake.asset)}`
+                : "Lost"}
+            </span>
+          )}
+        </div>
+      )}
     </article>
   );
 }
@@ -60,6 +92,21 @@ function VerdictRow({ p }: { p: ResolvedPrediction }) {
 export function PredictionArena() {
   const { data, loading } = useArena();
   const { resolved, summary, shadow } = data;
+  const [stakes, setStakes] = useState<Stake[]>([]);
+
+  // Fetch stakes
+  useEffect(() => {
+    if (resolved.length === 0) return;
+
+    fetch("/api/stakes")
+      .then((res) => res.json())
+      .then((data) => setStakes(data.stakes || []))
+      .catch((err) => console.error("[Arena] Failed to fetch stakes:", err));
+  }, [resolved]);
+
+  const getStakeForPrediction = (predictionId: string): Stake | undefined => {
+    return stakes.find((stake) => stake.predictionId === predictionId);
+  };
 
   const settled = resolved.filter((r) => r.verdict !== "pending");
   const pending = resolved.filter((r) => r.verdict === "pending");
@@ -111,7 +158,7 @@ export function PredictionArena() {
                 <Stagger className={styles.list} stagger={0.04}>
                   {settled.map((p, i) => (
                     <StaggerItem key={`${p.timestamp}-${i}`}>
-                      <VerdictRow p={p} />
+                      <VerdictRow p={p} stake={getStakeForPrediction(p.id || "")} />
                     </StaggerItem>
                   ))}
                 </Stagger>
@@ -124,7 +171,7 @@ export function PredictionArena() {
                 <Stagger className={styles.list} stagger={0.04}>
                   {pending.map((p, i) => (
                     <StaggerItem key={`${p.timestamp}-${i}`}>
-                      <VerdictRow p={p} />
+                      <VerdictRow p={p} stake={getStakeForPrediction(p.id || "")} />
                     </StaggerItem>
                   ))}
                 </Stagger>

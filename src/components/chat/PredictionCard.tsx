@@ -5,9 +5,14 @@
  *
  * The recalled `match` is a plain "TeamA vs TeamB" string, so we split it and
  * resolve flags ourselves to keep the card visually consistent with fixtures.
+ *
+ * Now includes stake status display when a stake is attached to the prediction.
  */
 
+import { Coins } from "lucide-react";
 import { Flag } from "@/components/ui/Flag";
+import type { Stake } from "@/types";
+import { getStakeStatusLabel, getStakeStatusColor, formatStakeAmount } from "@/lib/stakes";
 import styles from "./PredictionCard.module.css";
 
 export interface PredictionCardProps {
@@ -16,6 +21,7 @@ export interface PredictionCardProps {
   predictedScore?: string;
   confidence?: number;
   reasoning?: string;
+  stake?: Stake; // Optional stake information
 }
 
 /** Split "TeamA vs TeamB" into its two sides (tolerant of casing/spacing). */
@@ -32,6 +38,7 @@ export function PredictionCard({
   predictedScore,
   confidence,
   reasoning,
+  stake,
 }: PredictionCardProps) {
   const teams = splitMatch(match);
 
@@ -63,7 +70,37 @@ export function PredictionCard({
         ) : null}
       </div>
 
-      {reasoning ? <p className={styles.reason}>“{reasoning}”</p> : null}
+      {reasoning ? <p className={styles.reason}>"{reasoning}"</p> : null}
+
+      {/* Stake status badge */}
+      {stake && (
+        <div className={styles.stakeSection}>
+          <div 
+            className={styles.stakeBadge}
+            style={{ '--stake-color': getStakeStatusColor(stake.status) } as React.CSSProperties}
+          >
+            <Coins size={14} aria-hidden />
+            <span className={styles.stakeAmount}>
+              {formatStakeAmount(stake.amount, stake.asset)}
+            </span>
+            <span className={styles.stakeStatus}>
+              {getStakeStatusLabel(stake.status)}
+            </span>
+          </div>
+          
+          {stake.status === 'won' && stake.payout && (
+            <span className={styles.stakePayout}>
+              Won: {formatStakeAmount(stake.payout, stake.asset)}
+            </span>
+          )}
+          
+          {stake.status === 'lost' && (
+            <span className={styles.stakeLost}>
+              Lost
+            </span>
+          )}
+        </div>
+      )}
     </article>
   );
 }
