@@ -30,8 +30,9 @@ export function ProfileView() {
           </p>
           <h1 className={styles.title}>Your cognitive fingerprint</h1>
           <p className={styles.lede}>
-            Every prediction leaves a trace. Your Shadow reads these patterns —
-            and uses them against you. Here&apos;s what it&apos;s found so far.
+            Every prediction leaves a trace. QVAC analyzes these patterns locally
+            on your device — your Shadow reads them and uses them against you.
+            Here&apos;s what it&apos;s found so far.
           </p>
         </header>
 

@@ -179,7 +179,7 @@ export function Leaderboard() {
                   : "Make a few predictions in the chat and you'll join the field, ranked against every other Shadow."}
               <span className={styles.poweredBy}>
                 {" "}
-                · Powered by QVAC local AI + WDK self-custody
+                · Powered by QVAC local AI · 100% private inference
               </span>
             </p>
           </>
