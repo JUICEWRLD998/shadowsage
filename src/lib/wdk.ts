@@ -11,6 +11,11 @@
  * self-custody. If the user clears browser data, their wallet is gone unless
  * they backed up the seed phrase themselves.
  *
+ * Supports:
+ *   - Native token (ETH) balance and transfers
+ *   - ERC-20 tokens (USDt) balance and transfers
+ *   - Message signing for authentication
+ *
  * Browser only (client-side).
  */
 
@@ -19,6 +24,30 @@
 type WDKInstance = any;
 type WDKAccount = any;
 type WDKWalletManagerEvm = any;
+
+// Standard USDt (Tether) contract addresses on various networks
+const USDT_CONTRACTS: Record<string, string> = {
+  // Ethereum Mainnet
+  "1": "0xdAC17F958D2ee523a2206206994597C13D831ec7",
+  // Sepolia Testnet (mock USDt for testing)
+  "11155111": "0x7169D38820dfd117C3FA1f22a697dBA58d90BA06",
+  // Polygon
+  "137": "0xc2132D05D31c914a87C6611C10748AEb04B58e8F",
+  // Arbitrum One
+  "42161": "0xFd086bC7CD5C481DCC9C85ebE478A1C0b69FCbb9",
+};
+
+// ERC-20 ABI for balance and transfer operations
+const ERC20_ABI = [
+  // balanceOf
+  "function balanceOf(address owner) view returns (uint256)",
+  // transfer
+  "function transfer(address to, uint256 amount) returns (bool)",
+  // decimals
+  "function decimals() view returns (uint8)",
+  // approve (for future DEX integration)
+  "function approve(address spender, uint256 amount) returns (bool)",
+];
 
 // Browser storage key for the encrypted seed phrase.
 const STORAGE_KEY = "shadowsage_wdk_seed";
@@ -254,6 +283,118 @@ export class WDKWalletService {
 
     const balance = await this.account.getBalance();
     return BigInt(balance.toString());
+  }
+
+  /**
+   * Get USDt (Tether) token balance.
+   * Returns the balance as a bigint (smallest unit, usually 6 decimals for USDt).
+   */
+  async getUSDtBalance(): Promise<bigint> {
+    if (!this.account) {
+      throw new Error("Wallet not connected. Call connect() first.");
+    }
+
+    try {
+      // Dynamic import for ethers (browser-only)
+      const { Contract, JsonRpcProvider } = await import("ethers");
+
+      const provider = new JsonRpcProvider(
+        process.env.NEXT_PUBLIC_WDK_EVM_PROVIDER || "https://eth.llamarpc.com"
+      );
+
+      // Get network to determine USDt contract address
+      const network = await provider.getNetwork();
+      const chainId = network.chainId.toString();
+      const usdtAddress = USDT_CONTRACTS[chainId];
+
+      if (!usdtAddress) {
+        throw new Error(`USDt contract not configured for chain ID ${chainId}`);
+      }
+
+      // Create contract instance
+      const usdtContract = new Contract(usdtAddress, ERC20_ABI, provider);
+
+      // Get balance
+      const balance = await usdtContract.balanceOf(this.address);
+      return BigInt(balance.toString());
+    } catch (error) {
+      console.error("[WDK] Failed to fetch USDt balance:", error);
+      throw error;
+    }
+  }
+
+  /**
+   * Transfer USDt tokens to another address.
+   * @param to - Recipient address
+   * @param amount - Amount in smallest unit (e.g., for 10 USDt with 6 decimals: 10000000)
+   * @returns Transaction hash
+   */
+  async transferUSDt(to: string, amount: bigint): Promise<string> {
+    if (!this.account) {
+      throw new Error("Wallet not connected. Call connect() first.");
+    }
+
+    try {
+      // Dynamic imports
+      const { Contract, JsonRpcProvider } = await import("ethers");
+      const WDK = (await import("@tetherto/wdk")).default;
+
+      const provider = new JsonRpcProvider(
+        process.env.NEXT_PUBLIC_WDK_EVM_PROVIDER || "https://eth.llamarpc.com"
+      );
+
+      // Get network and USDt contract address
+      const network = await provider.getNetwork();
+      const chainId = network.chainId.toString();
+      const usdtAddress = USDT_CONTRACTS[chainId];
+
+      if (!usdtAddress) {
+        throw new Error(`USDt contract not configured for chain ID ${chainId}`);
+      }
+
+      // Create contract instance with signer
+      const usdtContract = new Contract(usdtAddress, ERC20_ABI, this.account);
+
+      // Execute transfer
+      const tx = await usdtContract.transfer(to, amount);
+      const receipt = await tx.wait();
+
+      return receipt.hash;
+    } catch (error) {
+      console.error("[WDK] Failed to transfer USDt:", error);
+      throw error;
+    }
+  }
+
+  /**
+   * Sign a stake commitment message.
+   * This creates a cryptographic proof that the user intends to stake,
+   * even if the on-chain transaction isn't executed (fallback mode).
+   * @param predictionId - The prediction being staked on
+   * @param amount - Amount in decimal string (e.g., "10.00")
+   * @param asset - Asset being staked (e.g., "USDt")
+   * @returns Hex signature
+   */
+  async signStakeCommitment(
+    predictionId: string,
+    amount: string,
+    asset: string
+  ): Promise<string> {
+    if (!this.account) {
+      throw new Error("Wallet not connected. Call connect() first.");
+    }
+
+    const message = [
+      "ShadowSage - Stake Commitment",
+      "",
+      `I commit to staking ${amount} ${asset} on prediction ${predictionId}.`,
+      "This is a binding commitment to back my football prediction.",
+      "",
+      `Wallet: ${this.address}`,
+      `Timestamp: ${new Date().toISOString()}`,
+    ].join("\n");
+
+    return this.signMessage(message);
   }
 
   /**

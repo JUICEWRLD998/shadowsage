@@ -218,6 +218,42 @@ export interface AppState {
   shadowAccuracy: number;
 }
 
+// ==================== STAKES ====================
+
+export type StakeStatus =
+  | "pending" // Stake created, waiting for transaction or confirmation
+  | "signed" // User signed the stake intent (fallback mode)
+  | "confirmed" // Transaction confirmed on-chain
+  | "won" // Prediction was correct, stake won
+  | "lost" // Prediction was wrong, stake lost
+  | "cancelled"; // Stake cancelled before match
+
+export type StakeAsset = "USDt" | "ETH";
+
+export interface Stake {
+  id: string;
+  predictionId: string;
+  matchId: string;
+  walletAddress: string;
+  amount: string; // Decimal string to preserve precision (e.g., "10.00")
+  asset: StakeAsset;
+  status: StakeStatus;
+  signature: string; // User's signature committing to the stake
+  transactionId?: string; // On-chain transaction hash (if confirmed)
+  createdAt: string; // ISO 8601
+  confirmedAt?: string; // When transaction confirmed
+  resolvedAt?: string; // When match result determined outcome
+  payout?: string; // Amount won (if status is "won")
+}
+
+export interface StakeSummary {
+  totalStaked: string; // Total USDt staked across all predictions
+  totalWon: string; // Total USDt won
+  totalLost: string; // Total USDt lost
+  pendingStakes: number; // Count of unresolved stakes
+  winRate: number; // Percentage of won stakes
+}
+
 // ==================== MEMORY ====================
 
 /** Memory namespaces — one bucket per data domain. */
