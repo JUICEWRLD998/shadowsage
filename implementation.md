@@ -110,21 +110,51 @@ The core product loop stays strong: users make football predictions, local AI le
 
 ## Phase 5: WDK Wallet Integration
 
-- Remove Sui wallet provider and Sui-specific auth copy.
-- Add WDK wallet provider/service.
-- Implement:
-  - wallet create/connect
-  - account/address display
-  - signed nonce auth
-  - balance display where WDK supports it
-  - explicit sign-out
-- Session identity becomes the WDK wallet address.
-- Update auth gate copy:
-  - "Connect your Tether-compatible wallet"
-  - "Your predictions, bias profile, and stake intents are scoped to this wallet"
-- Keep the wallet flow self-custodial:
-  - no private keys leave the wallet layer
-  - AI never executes payments automatically
+**Status: Complete.** WDK wallet integration is fully implemented with browser-based self-custodial wallets, seed phrase management, Ethereum signature verification (EIP-191), balance display, and complete session management. All Sui wallet dependencies have been removed.
+
+### Completed Items:
+- ✅ Removed Sui wallet provider (`@mysten/dapp-kit`, `@mysten/seal`, `@mysten/sui`)
+- ✅ Added WDK wallet dependencies (`@tetherto/wdk`, `@tetherto/wdk-wallet-evm`, `ethers`)
+- ✅ Created WDK wallet service adapter (`src/lib/wdk.ts`)
+  - Browser-based seed phrase management with localStorage
+  - Wallet creation with random 12-word seed phrase
+  - Wallet restore from existing seed phrase
+  - Message signing with EIP-191 standard
+  - Balance checking (ETH/native token)
+  - Secure disconnect and wallet deletion
+- ✅ Updated auth API routes for WDK
+  - `/api/auth/verify` uses `ethers.verifyMessage()` for EIP-191 signatures
+  - Nonce-based challenge/response authentication
+  - Address recovery from signature
+- ✅ Updated all auth components
+  - `AuthGate`: "Connect your Tether-compatible wallet" UI
+  - `AuthContext`: WDK wallet lifecycle management
+  - `NavWallet`: Custom connect button with WDK service
+  - `WalletBadge`: Address display with ETH balance (30s refresh)
+- ✅ Updated app layout
+  - Removed `SuiProvider` wrapper (not needed for WDK)
+  - Simplified provider tree
+- ✅ Updated environment configuration
+  - `NEXT_PUBLIC_WDK_EVM_PROVIDER` for RPC endpoint
+  - Testnet support (Sepolia, Polygon, Arbitrum)
+- ✅ Documentation
+  - README.md with installation and testing instructions
+  - WDK-TESTING.md with comprehensive technical guide
+  - Troubleshooting and debugging information
+
+### Technical Details:
+- Wallet storage: Browser localStorage with XOR obfuscation
+- Signature standard: EIP-191 (Ethereum personal_sign)
+- Session identity: Verified EVM address (lowercase)
+- Balance display: Native chain token (ETH) with 30-second refresh
+- Self-custody: Seed phrase never leaves browser, all operations client-side
+
+### Implementation:
+- Session identity is the verified WDK wallet address
+- Auth gate copy: "Connect your Tether-compatible wallet"
+- Memory and predictions remain scoped to wallet address
+- Balance display integrated in WalletBadge component
+- Explicit sign-out clears session and disconnects wallet (localStorage persists)
 
 ## Phase 6: USDt Fan Stake Flow
 

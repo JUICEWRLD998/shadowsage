@@ -107,35 +107,46 @@ Records are scoped by the verified wallet/session address so one wallet's predic
 
 ## Getting Started
 
-### 1. Install
+### 1. Install Dependencies
 
 ```bash
 npm install
 ```
+
+**Important:** If you encounter timeout issues during installation, the following packages are required for WDK wallet functionality:
+
+```bash
+npm install @tetherto/wdk @tetherto/wdk-wallet-evm ethers
+```
+
+These packages enable:
+- `@tetherto/wdk` - Core WDK wallet orchestration
+- `@tetherto/wdk-wallet-evm` - Ethereum and EVM-compatible chain support
+- `ethers` - Ethereum signature verification
 
 ### 2. Configure Environment
 
 Create `.env.local`:
 
 ```bash
+# Football data
 FOOTBALL_DATA_API_KEY=your_football_data_api_key
 FOOTBALL_DATA_URL=https://api.football-data.org/v4
 FOOTBALL_DATA_COMPETITION=WC
 FOOTBALL_DATA_SEASON=2026
 
-# Local QVAC runtime.
-QVAC_RUNTIME_ENDPOINT=your_local_qvac_runtime_endpoint
+# Local QVAC runtime
+QVAC_RUNTIME_ENDPOINT=http://localhost:11434
 QVAC_CHAT_COMPLETIONS_PATH=/v1/chat/completions
 QVAC_MODEL_ID=your_local_qvac_model_id
 QVAC_TIMEOUT_MS=30000
 
-# Local wallet-scoped memory.
+# Local wallet-scoped memory
 LOCAL_MEMORY_FILE=memory.json
 
-# Placeholder values until Phase 5 integration finalizes exact WDK requirements.
-WDK_NETWORK=testnet
-WDK_APP_ID=shadowsage
-WDK_USDT_ASSET_ID=your_usdt_asset_id
+# WDK wallet configuration (browser-side)
+NEXT_PUBLIC_WDK_EVM_PROVIDER=https://eth.llamarpc.com
+NEXT_PUBLIC_APP_URL=http://localhost:3000
 ```
 
 Or copy `.env.example`:
@@ -152,9 +163,69 @@ npm run dev
 
 Open the local URL printed by Next.js, usually `http://localhost:3000`.
 
+### 4. Test WDK Wallet Integration
+
+**First Time Setup:**
+
+1. Navigate to any protected route (e.g., `/chat`, `/arena`, `/profile`)
+2. You'll see the AuthGate with "Create or Restore Wallet" button
+3. Click the button to create a new WDK wallet
+4. **IMPORTANT:** A browser alert will show your 12-word seed phrase
+5. **Back up this seed phrase immediately** - it's the only way to recover your wallet
+6. The wallet will automatically sign in after creation
+
+**Wallet Features:**
+
+- **Self-custodial:** Your seed phrase is stored encrypted in browser localStorage
+- **Never leaves your device:** All wallet operations happen client-side
+- **Ethereum-compatible:** Uses standard EVM addresses and EIP-191 signatures
+- **Balance display:** NavWallet badge shows your ETH balance (refreshes every 30s)
+- **Session-based auth:** Signed message proves wallet ownership without passwords
+
+**Testing the Flow:**
+
+1. **Create wallet:** Click "Create or Restore Wallet" → save seed phrase
+2. **Auto sign-in:** Wallet automatically signs a nonce to create session
+3. **Check balance:** Look for balance in the wallet badge (top-right)
+4. **Make predictions:** Chat interface should now be accessible
+5. **Disconnect:** Click logout button to clear session
+6. **Reconnect:** Refresh page - wallet auto-connects from localStorage
+7. **Restore:** Delete wallet from localStorage, then restore using seed phrase
+
+**Troubleshooting:**
+
+- **"Module not found" errors:** Run `npm install` again to ensure all packages installed
+- **Balance shows 0 ETH:** Normal for new wallets - use a testnet faucet to get test ETH
+- **Signature verification fails:** Check that `NEXT_PUBLIC_WDK_EVM_PROVIDER` is set correctly
+- **Wallet won't connect:** Clear browser localStorage and create a new wallet
+- **Lost seed phrase:** Cannot recover - wallet is permanently lost (this is self-custody)
+
+**RPC Endpoints:**
+
+The default provider (`https://eth.llamarpc.com`) is Ethereum mainnet. For testing:
+
+- **Sepolia testnet:** `https://sepolia.drpc.org`
+- **Polygon Mumbai:** `https://rpc-mumbai.maticvigil.com`
+- **Local node:** `http://localhost:8545`
+
+Update `NEXT_PUBLIC_WDK_EVM_PROVIDER` in `.env.local` to switch networks.
+
 ## Current Implementation Status
 
-Phase 1 through Phase 4 are complete: ShadowSage rebrand, football-data.org fixture/result integration, QVAC-only product AI routing, and local wallet-scoped memory are in place. The existing codebase still contains previous wallet integration code while WDK is being integrated in Phase 5. See `implementation.md` for the full phased plan.
+**Phase 1-4:** ✅ Complete - ShadowSage rebrand, football-data.org integration, QVAC-only AI routing, and local wallet-scoped memory are in place.
+
+**Phase 5:** ✅ Complete - WDK wallet integration:
+- ✅ Removed Sui wallet dependencies
+- ✅ Created WDK wallet service adapter (`src/lib/wdk.ts`)
+- ✅ Browser-based self-custodial wallet with seed phrase management
+- ✅ Updated all auth components (AuthGate, NavWallet, WalletBadge)
+- ✅ Ethereum signature verification (EIP-191)
+- ✅ Balance display and session management
+- ✅ Updated environment configuration
+
+**Phase 6:** 🚧 Next - USDt fan stake flow with WDK payment primitives
+
+See `implementation.md` for the full phased plan.
 
 ## Project Structure
 
