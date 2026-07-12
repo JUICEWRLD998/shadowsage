@@ -78,17 +78,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           setStatus("unauthenticated");
         }
 
-        // Check for stored WDK wallet
-        if (wdkWallet.hasStoredWallet()) {
-          try {
-            const { address: wAddress } = await wdkWallet.connect();
-            if (!cancelled) {
-              setWalletAddress(wAddress.toLowerCase());
-            }
-          } catch (e) {
-            console.warn("[AuthContext] Failed to auto-connect WDK wallet:", e);
-          }
-        }
+        // Check for stored WDK wallet — not applicable for injected wallets
+        // (they manage their own connection state)
       } catch {
         if (!cancelled) setStatus("unauthenticated");
       }
@@ -101,29 +92,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const connectWallet = useCallback(async () => {
     setError(null);
     try {
-      let wAddress: string;
-      
-      if (wdkWallet.hasStoredWallet()) {
-        // Connect to existing wallet
-        const result = await wdkWallet.connect();
-        wAddress = result.address;
-      } else {
-        // Create new wallet
-        const result = await wdkWallet.createWallet();
-        wAddress = result.address;
-        
-        // Show seed phrase to user (they MUST back this up)
-        // In a real app, show this in a proper modal with confirmation
-        console.warn(
-          "[WDK] New wallet created! Back up your seed phrase:",
-          result.seedPhrase
-        );
-        alert(
-          `🔐 IMPORTANT: Back up your seed phrase!\n\n${result.seedPhrase}\n\nStore it safely. You'll need it to recover your wallet.`
-        );
-      }
-      
-      setWalletAddress(wAddress.toLowerCase());
+      // Always call connect() — it handles both new connections and reconnects.
+      const result = await wdkWallet.connect();
+      setWalletAddress(result.address.toLowerCase());
     } catch (e) {
       const msg = e instanceof Error ? e.message : "Failed to connect wallet.";
       setError(msg);
@@ -177,20 +148,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, [walletAddress]);
 
-  // 2. When a wallet connects and we're not yet authenticated, auto-run the
-  //    handshake so "connect" flows straight into "sign in".
-  useEffect(() => {
-    if (
-      walletAddress &&
-      (status === "unauthenticated" || status === "error") &&
-      signingFor.current === null &&
-      // Don't re-prompt if the connected wallet already matches the session.
-      walletAddress !== address
-    ) {
-      void signIn();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [walletAddress, status]);
+  // NOTE: We do NOT auto-run signIn when a wallet connects.
+  // The user must explicitly click "Sign In" after connecting their wallet.
+  // Auto-signing is surprising UX — the connect step and the auth step are
+  // intentionally separate so the user understands what they're approving.
 
   const signOut = useCallback(async () => {
     try {

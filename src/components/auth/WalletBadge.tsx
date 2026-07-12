@@ -14,8 +14,8 @@
 import { useEffect, useState } from "react";
 import { LogOut } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
-import { wdkWallet } from "@/lib/wdk";
 import { displayNameForAddress } from "@/lib/leaderboard";
+import { wdkWallet } from "@/lib/wdk";
 import styles from "./WalletBadge.module.css";
 
 function truncate(address: string): string {

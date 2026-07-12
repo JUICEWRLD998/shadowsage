@@ -1,47 +1,55 @@
 /**
- * Stakes helper — utility functions for stake management.
+ * Stakes helper — in-memory store + utility functions for stake management.
  *
- * Handles stake retrieval, summary calculation, and resolution logic.
+ * Intentionally does NOT import memory.ts (which uses node:fs/promises and
+ * cannot be bundled for the browser). Stakes are kept in a server-side
+ * in-memory Map that survives the process lifetime (dev/demo scope).
+ *
+ * Safe to import from both client components and API routes because the Map
+ * itself only lives in the server process — client code only ever calls the
+ * /api/stakes HTTP endpoints, never this module directly.
  */
 
-import { recallMemories, rememberAsync } from "@/lib/memory";
-import type { Stake, StakeSummary, Prediction, MatchResult } from "@/types";
+import type { Stake, StakeSummary } from "@/types";
 
-/**
- * Get all stakes for a specific wallet address.
- */
-export async function getStakesForWallet(
-  walletAddress: string
-): Promise<Stake[]> {
-  const allStakes = await recallMemories<Stake>("stakes");
-  return allStakes.filter((stake) => stake.walletAddress === walletAddress);
+// ── In-memory store ───────────────────────────────────────────────────────────
+
+const stakeStore = new Map<string, Stake>();
+
+export function saveStake(stake: Stake): void {
+  stakeStore.set(stake.id, stake);
 }
 
-/**
- * Get a specific stake by ID.
- */
-export async function getStakeById(stakeId: string): Promise<Stake | null> {
-  const allStakes = await recallMemories<Stake>("stakes");
-  return allStakes.find((stake) => stake.id === stakeId) || null;
+export function getStakeById(stakeId: string): Stake | null {
+  return stakeStore.get(stakeId) ?? null;
 }
 
-/**
- * Get stakes for a specific prediction.
- */
-export async function getStakesForPrediction(
-  predictionId: string
-): Promise<Stake[]> {
-  const allStakes = await recallMemories<Stake>("stakes");
-  return allStakes.filter((stake) => stake.predictionId === predictionId);
+export function getAllStakes(): Stake[] {
+  return Array.from(stakeStore.values());
 }
 
-/**
- * Calculate stake summary for a wallet.
- */
-export async function calculateStakeSummary(
-  walletAddress: string
-): Promise<StakeSummary> {
-  const stakes = await getStakesForWallet(walletAddress);
+export function getStakesForWallet(walletAddress: string): Stake[] {
+  return getAllStakes().filter(
+    (s) => s.walletAddress.toLowerCase() === walletAddress.toLowerCase(),
+  );
+}
+
+export function getStakesForPrediction(predictionId: string): Stake[] {
+  return getAllStakes().filter((s) => s.predictionId === predictionId);
+}
+
+export function updateStake(stakeId: string, patch: Partial<Stake>): Stake | null {
+  const existing = stakeStore.get(stakeId);
+  if (!existing) return null;
+  const updated = { ...existing, ...patch };
+  stakeStore.set(stakeId, updated);
+  return updated;
+}
+
+// ── Summary ───────────────────────────────────────────────────────────────────
+
+export function calculateStakeSummary(walletAddress: string): StakeSummary {
+  const stakes = getStakesForWallet(walletAddress);
 
   let totalStaked = 0;
   let totalWon = 0;
@@ -52,135 +60,75 @@ export async function calculateStakeSummary(
 
   for (const stake of stakes) {
     const amount = parseFloat(stake.amount);
-
-    // Count towards total staked if confirmed or signed
-    if (stake.status === "confirmed" || stake.status === "signed") {
-      totalStaked += amount;
-    }
-
-    // Count resolved stakes
+    if (stake.status === "confirmed" || stake.status === "signed") totalStaked += amount;
     if (stake.status === "won") {
       totalWon += stake.payout ? parseFloat(stake.payout) : amount;
       wonCount++;
     } else if (stake.status === "lost") {
       totalLost += amount;
       lostCount++;
-    } else if (
-      stake.status === "pending" ||
-      stake.status === "signed" ||
-      stake.status === "confirmed"
-    ) {
+    } else if (["pending", "signed", "confirmed"].includes(stake.status)) {
       pendingCount++;
     }
   }
 
-  const resolvedCount = wonCount + lostCount;
-  const winRate = resolvedCount > 0 ? (wonCount / resolvedCount) * 100 : 0;
+  const resolved = wonCount + lostCount;
+  const winRate = resolved > 0 ? Math.round(((wonCount / resolved) * 100) * 10) / 10 : 0;
 
   return {
     totalStaked: totalStaked.toFixed(2),
     totalWon: totalWon.toFixed(2),
     totalLost: totalLost.toFixed(2),
     pendingStakes: pendingCount,
-    winRate: Math.round(winRate * 10) / 10, // Round to 1 decimal
+    winRate,
   };
 }
 
-/**
- * Resolve a stake based on match result.
- * Updates stake status to "won" or "lost" and sets payout if won.
- */
-export async function resolveStake(
+// ── Resolution ────────────────────────────────────────────────────────────────
+
+export function resolveStake(
   stakeId: string,
-  prediction: Prediction,
-  result: MatchResult
-): Promise<Stake | null> {
-  const stake = await getStakeById(stakeId);
+  won: boolean,
+): Stake | null {
+  const stake = stakeStore.get(stakeId);
   if (!stake) return null;
+  if (stake.status === "won" || stake.status === "lost") return stake;
 
-  // Already resolved
-  if (stake.status === "won" || stake.status === "lost") {
-    return stake;
-  }
-
-  // Determine outcome
-  const won = result.userCorrect;
   const amount = parseFloat(stake.amount);
-
-  // Simple 1:1 payout for demo (in real app, odds would determine payout)
   const payout = won ? (amount * 2).toFixed(2) : undefined;
 
-  const updatedStake: Stake = {
-    ...stake,
+  return updateStake(stakeId, {
     status: won ? "won" : "lost",
     payout,
     resolvedAt: new Date().toISOString(),
-  };
-
-  // Save updated stake
-  await rememberAsync("stakes", stakeId, updatedStake);
-
-  return updatedStake;
+  });
 }
 
-/**
- * Resolve all stakes for a specific match when results are available.
- */
-export async function resolveStakesForMatch(
-  matchId: string,
-  predictions: Prediction[]
-): Promise<number> {
-  const allStakes = await recallMemories<Stake>("stakes");
-  const matchStakes = allStakes.filter((stake) => stake.matchId === matchId);
+// ── Display helpers ───────────────────────────────────────────────────────────
 
-  let resolvedCount = 0;
-
-  for (const stake of matchStakes) {
-    // Find corresponding prediction
-    const prediction = predictions.find((p) => p.id === stake.predictionId);
-    if (!prediction || !prediction.result) continue;
-
-    // Resolve the stake
-    await resolveStake(stake.id, prediction, prediction.result);
-    resolvedCount++;
-  }
-
-  return resolvedCount;
-}
-
-/**
- * Format stake amount for display.
- */
 export function formatStakeAmount(amount: string, asset: string): string {
-  const num = parseFloat(amount);
-  return `${num.toFixed(2)} ${asset}`;
+  return `${parseFloat(amount).toFixed(2)} ${asset}`;
 }
 
-/**
- * Get stake status display label.
- */
 export function getStakeStatusLabel(status: Stake["status"]): string {
   const labels: Record<Stake["status"], string> = {
-    pending: "Pending",
-    signed: "Signed",
+    pending:   "Pending",
+    signed:    "Signed",
     confirmed: "Confirmed",
-    won: "Won",
-    lost: "Lost",
+    won:       "Won",
+    lost:      "Lost",
     cancelled: "Cancelled",
   };
   return labels[status];
 }
 
-/**
- * Get stake status color for UI.
- */
 export function getStakeStatusColor(status: Stake["status"]): string {
   const colors: Record<Stake["status"], string> = {
-    pending: "var(--text-muted)",
-    signed: "var(--you-400)",
+    pending:   "var(--text-muted)",
+    signed:    "var(--you-400)",
     confirmed: "var(--you-300)",
-    won: "oklch(0.7 0.16 145)", // Green
-    lost: "var(--negative)",
+    won:       "oklch(0.7 0.16 145)",
+    lost:      "var(--negative)",
     cancelled: "var(--text-faint)",
   };
   return colors[status];

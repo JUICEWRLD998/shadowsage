@@ -52,11 +52,11 @@ export function AuthGate({ children }: { children: ReactNode }) {
           <Ghost size={16} aria-hidden /> ShadowSage
         </span>
 
-        <h1 className={styles.title}>Connect your Tether-compatible wallet</h1>
+        <h1 className={styles.title}>Connect your wallet</h1>
         <p className={styles.lede}>
           Your predictions, bias profile, and USDt stake intents are scoped to
-          this wallet. ShadowSage uses WDK self-custodial wallets — your keys
-          never leave your device.
+          your wallet address. Connect MetaMask, Phantom, or any browser wallet
+          to get started — your keys always stay in your wallet.
         </p>
 
         <div className={styles.actions}>
@@ -67,7 +67,7 @@ export function AuthGate({ children }: { children: ReactNode }) {
               disabled={status === "signing"}
             >
               <Wallet size={16} aria-hidden />
-              Create or Restore Wallet
+              Connect Wallet
             </button>
           )}
 
@@ -101,7 +101,7 @@ export function AuthGate({ children }: { children: ReactNode }) {
           Signing is free, proves you own the wallet, and never submits a
           transaction.{" "}
           <span className={styles.poweredBy}>
-            Powered by QVAC local AI + WDK self-custody
+            Powered by QVAC local AI
           </span>
         </p>
       </div>

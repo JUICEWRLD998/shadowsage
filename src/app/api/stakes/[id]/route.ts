@@ -1,11 +1,9 @@
 /**
- * PATCH /api/stakes/[id] — update a stake record.
- *
- * Used to update stake status (e.g., add transaction hash when confirmed).
+ * PATCH /api/stakes/[id] — update a stake (status, transactionId, payout).
  */
 
 import { requireSession } from "@/lib/auth/session";
-import { rememberAsync, recallMemories } from "@/lib/memory";
+import { getStakeById, updateStake } from "@/lib/stakes";
 import type { Stake } from "@/types";
 
 interface UpdateStakeBody {
@@ -17,7 +15,7 @@ interface UpdateStakeBody {
 
 export async function PATCH(
   req: Request,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   const session = await requireSession();
   if (session instanceof Response) return session;
@@ -31,34 +29,20 @@ export async function PATCH(
     return Response.json({ error: "Invalid JSON body." }, { status: 400 });
   }
 
-  // Retrieve existing stake
-  const stakes = await recallMemories<Stake>("stakes");
-  const existingStake = stakes.find((s) => s.id === id);
-
-  if (!existingStake) {
+  const existing = getStakeById(id);
+  if (!existing) {
     return Response.json({ error: "Stake not found." }, { status: 404 });
   }
 
-  // Verify ownership
-  if (existingStake.walletAddress !== session.address) {
-    return Response.json(
-      { error: "You can only update your own stakes." },
-      { status: 403 }
-    );
+  if (existing.walletAddress.toLowerCase() !== session.toLowerCase()) {
+    return Response.json({ error: "You can only update your own stakes." }, { status: 403 });
   }
 
-  // Update stake
-  const updatedStake: Stake = {
-    ...existingStake,
-    ...body,
-    confirmedAt:
-      body.status === "confirmed" && !existingStake.confirmedAt
-        ? new Date().toISOString()
-        : existingStake.confirmedAt,
-  };
+  const patch: Partial<Stake> = { ...body };
+  if (body.status === "confirmed" && !existing.confirmedAt) {
+    patch.confirmedAt = new Date().toISOString();
+  }
 
-  // Store updated stake
-  await rememberAsync("stakes", id, updatedStake);
-
-  return Response.json({ stake: updatedStake });
+  const updated = updateStake(id, patch);
+  return Response.json({ stake: updated });
 }

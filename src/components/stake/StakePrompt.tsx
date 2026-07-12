@@ -11,10 +11,10 @@
  * Client-only.
  */
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Coins, Loader2, TrendingUp, AlertCircle } from "lucide-react";
-import { wdkWallet } from "@/lib/wdk";
 import { useAuth } from "@/context/AuthContext";
+import { wdkWallet } from "@/lib/wdk";
 import type { Prediction } from "@/types";
 import styles from "./StakePrompt.module.css";
 
@@ -36,10 +36,10 @@ export function StakePrompt({ prediction, onStakeCreated, onDismiss }: StakeProm
   const [balanceLoading, setBalanceLoading] = useState(false);
 
   // Fetch USDt balance when component mounts
-  useState(() => {
+  useEffect(() => {
     if (address) {
       setBalanceLoading(true);
-      wdkWallet
+      wdkWalletClient
         .getUSDtBalance()
         .then(setUsdtBalance)
         .catch((err) => {
@@ -48,7 +48,7 @@ export function StakePrompt({ prediction, onStakeCreated, onDismiss }: StakeProm
         })
         .finally(() => setBalanceLoading(false));
     }
-  });
+  }, [address]);
 
   const handleStake = async () => {
     if (!selectedAmount || !address) return;

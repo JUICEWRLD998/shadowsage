@@ -22,6 +22,7 @@ import { useShadowState } from "@/hooks/useShadowState";
 import { MessageBubble } from "./MessageBubble";
 import { ChatInput } from "./ChatInput";
 import { ShadowAwakening } from "./ShadowAwakening";
+import { StakePrompt } from "@/components/stake/StakePrompt";
 import styles from "./ChatWindow.module.css";
 
 /** localStorage flag so the awakening ceremony plays at most once per browser. */
@@ -74,12 +75,14 @@ function displayRole(message: UIMessage): ChatRole | null {
 }
 
 export function ChatWindow() {
-  const { messages, sendMessage, status, error } = useChat({
+  const { messages, sendMessage, status, error, data } = useChat({
     transport: new DefaultChatTransport({ api: "/api/chat" }),
   });
 
   const { emerge, respond } = useShadowState();
   const [qvacStatus, setQvacStatus] = useState<QvacStatusResponse | null>(null);
+  const [latestPrediction, setLatestPrediction] = useState<any | null>(null);
+  const [showStakePrompt, setShowStakePrompt] = useState(false);
 
   const scrollRef = useRef<HTMLDivElement>(null);
   const endRef = useRef<HTMLDivElement>(null);
@@ -201,6 +204,17 @@ export function ChatWindow() {
     void handleAfterTurn(lastAssistant.id, messages);
   }, [status, messages, handleAfterTurn]);
 
+  // Detect prediction data and show stake prompt
+  useEffect(() => {
+    if (data && Array.isArray(data) && data.length > 0) {
+      const predictionData = data.find((d: any) => d.prediction);
+      if (predictionData?.prediction && predictionData.prediction !== latestPrediction) {
+        setLatestPrediction(predictionData.prediction);
+        setShowStakePrompt(true);
+      }
+    }
+  }, [data, latestPrediction]);
+
   return (
     <section className={styles.window}>
       <div className={styles.scroll} ref={scrollRef}>
@@ -271,6 +285,19 @@ export function ChatWindow() {
           <ChatInput onSend={(text) => sendMessage({ text })} disabled={isBusy} />
         </div>
       </div>
+
+      <AnimatePresence>
+        {showStakePrompt && latestPrediction && (
+          <StakePrompt
+            prediction={latestPrediction}
+            onClose={() => setShowStakePrompt(false)}
+            onStakeCreated={() => {
+              setShowStakePrompt(false);
+              // Optionally refresh predictions or stakes
+            }}
+          />
+        )}
+      </AnimatePresence>
 
       <AnimatePresence>
         {awakening && (

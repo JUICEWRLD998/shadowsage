@@ -143,7 +143,16 @@ export async function POST(req: Request) {
       writer.write({ type: "text-end", id });
 
       try {
-        await captureMemory(messages, assistantText, predictions.length, userId);
+        const predictionMade = await captureMemory(messages, assistantText, predictions.length, userId);
+        
+        // Signal to frontend if a prediction was made
+        if (predictionMade) {
+          writer.write({
+            type: "data" as any,
+            id: `prediction-${Date.now()}`,
+            data: { prediction: predictionMade },
+          });
+        }
       } catch (error) {
         console.error("[/api/chat] memory write-back failed:", error);
       }
@@ -157,19 +166,23 @@ export async function POST(req: Request) {
  * Post-turn memory loop: extract a prediction from the just-finished exchange,
  * store it, and refresh the silent bias profile once enough predictions exist.
  * Runs in onFinish; all writes are best-effort.
+ * 
+ * Returns the stored prediction if one was extracted, null otherwise.
  */
 async function captureMemory(
   messages: UIMessage[],
   assistantReply: string,
   priorCount: number,
   userId: string,
-): Promise<void> {
+): Promise<any | null> {
   const transcript = buildTranscript(messages, assistantReply);
   const parsed = await extractPrediction(transcript);
-  if (!parsed) return;
+  if (!parsed) return null;
 
   const prediction = buildPrediction(parsed);
-  await storePrediction(prediction, userId);
+  const stored = await storePrediction(prediction, userId);
+  
+  if (!stored) return null;
 
   // Refresh bias analysis only when a new pick pushes us past the threshold —
   // avoids re-running the analyst on every idle message.
@@ -183,4 +196,6 @@ async function captureMemory(
     const biases = await detectBiases(block);
     await storeBiasProfiles(biases, userId);
   }
+  
+  return prediction;
 }

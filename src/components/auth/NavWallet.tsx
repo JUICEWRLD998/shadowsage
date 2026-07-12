@@ -6,11 +6,11 @@
  * It collapses the connect → sign → session handshake into one slot:
  *   - authenticated  → the WalletBadge (name + address + disconnect)
  *   - signing        → a "Signing…" indicator while the wallet prompt is open
- *   - otherwise      → "Connect Wallet" button, plus a "Sign to enter" nudge
- *                      if a wallet is connected but no session exists yet
+ *   - wallet connected, no session → "Sign to enter" button (explicit opt-in)
+ *   - no wallet      → "Connect" button to create/restore a wallet
  *
- * Connecting a WDK wallet auto-triggers the sign-in handshake (see AuthContext),
- * so in the common case the user only clicks once.
+ * Connect and Sign-in are intentionally two separate steps — the user
+ * explicitly chooses to sign the auth message rather than it happening silently.
  *
  * Client-only.
  */
@@ -48,7 +48,7 @@ export function NavWallet() {
     );
   }
 
-  // No wallet yet — show connect button. Connecting auto-runs sign-in.
+  // No wallet yet — show connect button.
   return (
     <button className={styles.connectBtn} onClick={() => void connectWallet()}>
       <Wallet size={16} aria-hidden />
